@@ -16,9 +16,33 @@
 </head>
 <body>
 
+  <!-- ROTATE PHONE PROMPT (PORTRAIT WARNING FOR MOBILE) -->
+  <div id="orientation-warning" class="orientation-warning">
+    <div class="orient-card">
+      <div class="orient-phone-anim">
+        <div class="phone-screen"></div>
+        <div class="orient-rotate-arrow">⟳</div>
+      </div>
+      <div class="orient-badge">ABRIR NA HORIZONTAL</div>
+      <h3>GIRE O CELULAR DE LADO</h3>
+      <p>SUPER FIGHTERS COMBAT foi desenvolvido para ser jogado na horizontal com o joystick analógico e botões arcade.</p>
+      <button class="arcade-btn btn-primary" onclick="window.gameEngine.toggleFullscreen()">
+        <span class="btn-main">JOGAR EM TELA CHEIA (HORIZONTAL)</span>
+      </button>
+      <button class="orient-dismiss-btn" onclick="window.gameEngine.dismissRotateWarning()">
+        CONTINUAR EM PÉ
+      </button>
+    </div>
+  </div>
+
   <div id="game-wrapper">
     <!-- Main Game Canvas Container -->
     <div id="game-container">
+      <!-- FLOATING UNIVERSAL FULLSCREEN BUTTON (ALWAYS ACCESSIBLE) -->
+      <button id="btn-fullscreen-global" class="global-fullscreen-btn" onclick="window.gameEngine.toggleFullscreen()" title="Alternar Tela Cheia">
+        <span class="fs-text">TELA CHEIA</span>
+      </button>
+
       <canvas id="gameCanvas" width="960" height="540"></canvas>
       <div class="crt-overlay"></div>
 
@@ -54,6 +78,7 @@
           <div class="arcade-sub">ROUND</div>
           <div class="hud-mobile-ctrls">
             <button id="btn-touch-toggle" class="hud-touch-toggle" onclick="window.gameEngine.toggleMobileControls()">CONTROLES</button>
+            <button id="btn-touch-fullscreen" class="hud-touch-toggle" onclick="window.gameEngine.toggleFullscreen()">TELA CHEIA</button>
             <button id="btn-touch-pause" class="hud-touch-pause" onclick="window.gameEngine.togglePause()">PAUSAR</button>
           </div>
         </div>
@@ -94,9 +119,12 @@
 
         <div class="preloader-top-bar">
           <div class="preloader-badge">SUPER FIGHTERS COMBAT • APRESENTAÇÃO DOS LUTADORES</div>
-          <button id="btn-skip-video" class="btn-skip-preloader" onclick="window.gameEngine.finishPreloading()">
-            PULAR VÍDEO
-          </button>
+          <div class="preloader-top-actions">
+            <button class="btn-skip-preloader" onclick="window.gameEngine.toggleFullscreen()">TELA CHEIA</button>
+            <button id="btn-skip-video" class="btn-skip-preloader" onclick="window.gameEngine.finishPreloading()">
+              PULAR VÍDEO
+            </button>
+          </div>
         </div>
 
         <div class="preloader-bottom-panel">
@@ -156,6 +184,9 @@
             </button>
 
             <div class="menu-bottom-row">
+              <button id="btn-fullscreen-title" class="arcade-btn-mini btn-fullscreen-highlight" onclick="window.gameEngine.toggleFullscreen()">
+                TELA CHEIA
+              </button>
               <button class="arcade-btn-mini" onclick="window.gameEngine.playIntroVideo()">
                 VER APRESENTAÇÃO
               </button>
@@ -537,8 +568,9 @@
           <div class="vpad-analog-label">ANALÓGICO</div>
         </div>
 
-        <!-- Center Mobile Quick Actions (Pause / Fullscreen) -->
+        <!-- Center Mobile Quick Actions (Fullscreen & Pause) -->
         <div class="vpad-center-utils">
+          <button class="vpad-util-btn btn-util-fs" onclick="window.gameEngine.toggleFullscreen()" aria-label="Tela Cheia">TELA CHEIA</button>
           <button class="vpad-util-btn" onclick="window.gameEngine.togglePause()" aria-label="Pausar Combate">PAUSAR</button>
         </div>
 

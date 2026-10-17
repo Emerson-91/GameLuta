@@ -12,7 +12,7 @@ class GameEngine {
     this.state = 'TITLE'; // TITLE, SELECT, LADDER, FIGHT, ROUND_OVER, MATCH_OVER, VICTORY_ENDING, CONTINUE
     this.selectedDifficulty = 'medium'; // 'easy', 'medium', 'hard', 'nightmare'
     this.isMobile = this.checkIsMobile();
-    this.mobileControlsVisible = this.isMobile;
+    this.mobileControlsVisible = true; // Always available on mobile / touch by default!
     if (this.isMobile) {
       document.body.classList.add('is-mobile-device');
     }
@@ -84,10 +84,50 @@ class GameEngine {
 
   checkIsMobile() {
     const ua = navigator.userAgent || '';
-    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i;
     const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    const isNarrow = window.innerWidth <= 900;
-    return mobileRegex.test(ua) || (hasTouch && isNarrow);
+    const isLandscapeMobile = (window.innerHeight < 600 && window.innerWidth < 1200);
+    const isNarrow = window.innerWidth <= 1024 || window.innerHeight <= 650;
+    return mobileRegex.test(ua) || hasTouch || isLandscapeMobile || isNarrow;
+  }
+
+  toggleFullscreen() {
+    const doc = window.document;
+    const docEl = document.getElementById('game-wrapper') || doc.documentElement;
+
+    const isFullscreen = doc.fullscreenElement || doc.mozFullScreenElement || doc.webkitFullscreenElement || doc.msFullscreenElement;
+
+    if (!isFullscreen) {
+      const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+      if (req) {
+        req.call(docEl).then(() => {
+          this.tryLockLandscape();
+        }).catch(() => {
+          this.tryLockLandscape();
+        });
+      } else {
+        this.tryLockLandscape();
+      }
+    } else {
+      const exit = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
+      if (exit) {
+        exit.call(doc);
+      }
+    }
+    setTimeout(() => this.resizeCanvas(), 250);
+  }
+
+  tryLockLandscape() {
+    try {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(() => {});
+      }
+    } catch (_) {}
+  }
+
+  dismissRotateWarning() {
+    document.body.classList.add('rotate-dismissed');
+    this.resizeCanvas();
   }
 
   resizeCanvas() {
@@ -253,8 +293,9 @@ class GameEngine {
     const vpad = document.getElementById('mobile-gamepad');
     if (!vpad) return;
 
-    if (this.isMobile) {
+    if (this.isMobile || this.mobileControlsVisible) {
       this.mobileControlsVisible = true;
+      vpad.classList.remove('hidden');
     }
 
     // ==========================================
@@ -271,6 +312,7 @@ class GameEngine {
       let centerX = 0;
       let centerY = 0;
       let maxRadius = 45;
+      let lastMenuNav = 0;
 
       const updateCenter = () => {
         baseRect = base.getBoundingClientRect();
@@ -299,28 +341,49 @@ class GameEngine {
           const hThreshold = maxRadius * 0.28;
           const vThreshold = maxRadius * 0.32;
 
-          // Horizontal Direction
-          if (dx < -hThreshold) {
-            this.keys['KeyA'] = true;
-            this.keys['KeyD'] = false;
-          } else if (dx > hThreshold) {
-            this.keys['KeyD'] = true;
-            this.keys['KeyA'] = false;
-          } else {
-            this.keys['KeyA'] = false;
-            this.keys['KeyD'] = false;
-          }
+          // If in FIGHT state, update fighter inputs:
+          if (this.state === 'FIGHT') {
+            // Horizontal Direction
+            if (dx < -hThreshold) {
+              this.keys['KeyA'] = true;
+              this.keys['KeyD'] = false;
+            } else if (dx > hThreshold) {
+              this.keys['KeyD'] = true;
+              this.keys['KeyA'] = false;
+            } else {
+              this.keys['KeyA'] = false;
+              this.keys['KeyD'] = false;
+            }
 
-          // Vertical Direction
-          if (dy < -vThreshold) {
-            this.keys['KeyW'] = true;
-            this.keys['KeyS'] = false;
-          } else if (dy > vThreshold) {
-            this.keys['KeyS'] = true;
-            this.keys['KeyW'] = false;
+            // Vertical Direction
+            if (dy < -vThreshold) {
+              this.keys['KeyW'] = true;
+              this.keys['KeyS'] = false;
+            } else if (dy > vThreshold) {
+              this.keys['KeyS'] = true;
+              this.keys['KeyW'] = false;
+            } else {
+              this.keys['KeyW'] = false;
+              this.keys['KeyS'] = false;
+            }
           } else {
-            this.keys['KeyW'] = false;
-            this.keys['KeyS'] = false;
+            // In Menus / Selection: navigate with joystick!
+            const now = performance.now();
+            if (now - lastMenuNav > 200) {
+              if (dy < -vThreshold) {
+                this.handleMenuNavigation({ code: 'KeyW', preventDefault: () => {} });
+                lastMenuNav = now;
+              } else if (dy > vThreshold) {
+                this.handleMenuNavigation({ code: 'KeyS', preventDefault: () => {} });
+                lastMenuNav = now;
+              } else if (dx < -hThreshold) {
+                this.handleMenuNavigation({ code: 'KeyA', preventDefault: () => {} });
+                lastMenuNav = now;
+              } else if (dx > hThreshold) {
+                this.handleMenuNavigation({ code: 'KeyD', preventDefault: () => {} });
+                lastMenuNav = now;
+              }
+            }
           }
         } else {
           this.keys['KeyA'] = false;
@@ -430,8 +493,17 @@ class GameEngine {
         }
 
         // Immediate trigger for action keys
-        if (['KeyF', 'KeyG', 'KeyH', 'Space'].includes(code)) {
-          this.handleInputs();
+        if (this.state === 'FIGHT') {
+          if (['KeyF', 'KeyG', 'KeyH', 'Space'].includes(code)) {
+            this.handleInputs();
+          }
+        } else {
+          // In Menus: SOCO/SUPER confirms, CHUTE goes back
+          if (code === 'KeyF' || code === 'Space') {
+            this.handleMenuNavigation({ code: 'Enter', preventDefault: () => {} });
+          } else if (code === 'KeyG') {
+            this.handleMenuNavigation({ code: 'Escape', preventDefault: () => {} });
+          }
         }
       };
 
@@ -1603,7 +1675,9 @@ class GameEngine {
       if (el) el.classList.add('hidden');
     });
     const vpad = document.getElementById('mobile-gamepad');
-    if (vpad) vpad.classList.add('hidden');
+    if (vpad) {
+      vpad.classList.toggle('hidden', !this.mobileControlsVisible);
+    }
   }
 
   returnToTitle() {
