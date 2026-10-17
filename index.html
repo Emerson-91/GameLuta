@@ -674,6 +674,9 @@
     }
     function triggerKeyOnce(code) {
       if (window.gameEngine) {
+        if (window.gameEngine.isMobile && code === 'KeyH') {
+          window.gameEngine.registerMobileSpecialTap();
+        }
         window.gameEngine.keys[code] = true;
         window.gameEngine.handleInputs();
         setTimeout(() => {

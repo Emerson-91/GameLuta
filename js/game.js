@@ -492,6 +492,11 @@ class GameEngine {
           try { navigator.vibrate(12); } catch (_) {}
         }
 
+        // Secret easter egg for mobile only: tap ESPECIAL button 5 times to unlock Vulcanus!
+        if (this.isMobile && code === 'KeyH') {
+          this.registerMobileSpecialTap();
+        }
+
         // Immediate trigger for action keys
         if (this.state === 'FIGHT') {
           if (['KeyF', 'KeyG', 'KeyH', 'Space'].includes(code)) {
@@ -737,21 +742,48 @@ class GameEngine {
     return PLAYABLE_ROSTER.filter(id => id !== 'dragon' || this.bossUnlocked);
   }
 
-  // Secret boss unlock triggered by typing 'boss'
-  unlockBoss() {
-    if (this.bossUnlocked) return;
+  // Secret boss unlock triggered by typing 'boss' (desktop) or tapping ESPECIAL 5x (mobile only)
+  unlockBoss(fromMobile = false) {
+    if (this.bossUnlocked) {
+      if (this.state === 'SELECT') {
+        this.selectFighter(this.activePicker || 'p1', 'dragon', true);
+      }
+      return;
+    }
     this.bossUnlocked = true;
 
     if (window.soundEngine) {
       window.soundEngine.playSuper();
     }
     if (window.particleSystem) {
-      window.particleSystem.shake(16);
+      window.particleSystem.shake(22);
+    }
+    if (navigator.vibrate) {
+      try { navigator.vibrate([100, 60, 200, 60, 400]); } catch (_) {}
+    }
+
+    if (window.uiManager) {
+      window.uiManager.showBanner('VULCANUS DESBLOQUEADO!', 'O CHEFÃO FINAL DRAGÃO ANCESTRAL CHEGOU!', 240, '#ef4444');
     }
 
     if (this.state === 'SELECT') {
       this.renderCharacterGrid();
       this.selectFighter(this.activePicker || 'p1', 'dragon', true);
+    }
+  }
+
+  // Count 5 taps on ESPECIAL button on mobile to unlock Vulcanus
+  registerMobileSpecialTap() {
+    if (!this.isMobile) return;
+    this.mobileSpecialTaps = (this.mobileSpecialTaps || 0) + 1;
+    clearTimeout(this.mobileSpecialTapTimer);
+    this.mobileSpecialTapTimer = setTimeout(() => {
+      this.mobileSpecialTaps = 0;
+    }, 4000);
+
+    if (this.mobileSpecialTaps >= 5) {
+      this.mobileSpecialTaps = 0;
+      this.unlockBoss(true);
     }
   }
 
