@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUPER FIGHTERS - Jogo de Luta Arcade</title>
+  <meta name="description" content="Jogo de luta 2D estilo Street Fighter e Mortal Kombat com animais lendários. Modo Solo com Torre Arcade e Dragão Boss Final, ou Versus 1v1 local!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="game-wrapper">
+    <!-- Main Game Canvas Container -->
+    <div id="game-container">
+      <canvas id="gameCanvas" width="960" height="540"></canvas>
+      <div class="crt-overlay"></div>
+
+      <!-- IN-GAME HUD -->
+      <div id="hud" class="hud-overlay hidden">
+        <!-- P1 HUD Info -->
+        <div class="hud-fighter p1-hud">
+          <div class="hud-portrait-frame">
+            <img id="p1-hud-portrait" src="assets/images/portrait_dog.jpg" alt="P1">
+          </div>
+          <div class="hud-bars">
+            <div class="hud-name-row">
+              <span id="p1-name" class="hud-name">UNICÃO</span>
+              <div id="p1-rounds" class="round-indicators">
+                <span class="round-dot"></span>
+                <span class="round-dot"></span>
+              </div>
+            </div>
+            <div class="hp-bar-bg">
+              <div id="p1-hp-lag" class="hp-bar-lag"></div>
+              <div id="p1-hp-fill" class="hp-bar-fill"></div>
+            </div>
+            <div class="meter-bar-bg">
+              <div id="p1-meter-fill" class="meter-bar-fill"></div>
+              <span id="p1-meter-text" class="meter-text">ESPECIAL: 0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Round Timer -->
+        <div class="hud-center">
+          <div id="match-timer" class="match-timer">99</div>
+          <div class="arcade-sub">ROUND</div>
+          <button id="btn-touch-toggle" class="hud-touch-toggle" onclick="window.gameEngine.toggleMobileControls()">📱 CONTROLES</button>
+        </div>
+
+        <!-- P2 HUD Info -->
+        <div class="hud-fighter p2-hud">
+          <div class="hud-bars">
+            <div class="hud-name-row">
+              <div id="p2-rounds" class="round-indicators">
+                <span class="round-dot"></span>
+                <span class="round-dot"></span>
+              </div>
+              <span id="p2-name" class="hud-name">BRUTUS</span>
+            </div>
+            <div class="hp-bar-bg">
+              <div id="p2-hp-lag" class="hp-bar-lag"></div>
+              <div id="p2-hp-fill" class="hp-bar-fill"></div>
+            </div>
+            <div class="meter-bar-bg">
+              <div id="p2-meter-fill" class="meter-bar-fill"></div>
+              <span id="p2-meter-text" class="meter-text">ESPECIAL: 0%</span>
+            </div>
+          </div>
+          <div class="hud-portrait-frame">
+            <img id="p2-hud-portrait" src="assets/images/portrait_alligator.jpg" alt="P2">
+          </div>
+        </div>
+      </div>
+
+      <!-- TITLE SCREEN -->
+      <div id="screen-title" class="menu-screen screen-title-bg">
+        <div class="title-content">
+          <div class="title-logo-container">
+            <div class="title-glitch-badge">ARCADE FIGHTING SYSTEM</div>
+            <h1 class="game-logo-text">SUPER FIGHTERS</h1>
+            <div class="game-subtitle">FÚRIA SELVAGEM • CLASH OF CLAWS</div>
+          </div>
+
+          <div class="menu-button-group">
+            <button class="arcade-btn btn-primary" onclick="window.gameEngine.startMode('solo')">
+              <span class="btn-icon">🐾</span>
+              <div class="btn-content">
+                <span class="btn-main">MODO SOLO (ARCADE)</span>
+                <span class="btn-sub">Suba a Torre dos 9 Animais até o Dragão Boss!</span>
+              </div>
+            </button>
+
+            <button class="arcade-btn btn-versus" onclick="window.gameEngine.startMode('pvp')">
+              <span class="btn-icon">⚔️</span>
+              <div class="btn-content">
+                <span class="btn-main">VERSUS (PLAYER VS PLAYER)</span>
+                <span class="btn-sub">Duelo 1v1 no Mesmo Teclado</span>
+              </div>
+            </button>
+
+            <button class="arcade-btn btn-cpu" onclick="window.gameEngine.startMode('cpu')">
+              <span class="btn-icon">🤖</span>
+              <div class="btn-content">
+                <span class="btn-main">VERSUS (PLAYER VS CPU)</span>
+                <span class="btn-sub">Lute Contra a Inteligência Artificial</span>
+              </div>
+            </button>
+
+            <button class="arcade-btn btn-training" onclick="window.gameEngine.startMode('training')">
+              <span class="btn-icon">🥋</span>
+              <div class="btn-content">
+                <span class="btn-main">MODO TREINO</span>
+                <span class="btn-sub">Pratique Golpes, Combos e Especiais</span>
+              </div>
+            </button>
+
+            <div class="menu-bottom-row">
+              <button id="btn-difficulty" class="arcade-btn-mini" onclick="window.gameEngine.cycleDifficulty(this)">
+                ⚡ DIFICULDADE: MÉDIO
+              </button>
+              <button class="arcade-btn-mini" onclick="window.gameEngine.openControlsModal()">
+                🎮 CONTROLES & GOLPES
+              </button>
+              <button class="arcade-btn-mini" onclick="toggleAudioSfx(this)">
+                🔊 SFX: LIGADO
+              </button>
+              <button class="arcade-btn-mini" onclick="toggleAudioMusic(this)">
+                🎵 MÚSICA: LIGADA
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARACTER SELECT SCREEN -->
+      <div id="screen-select" class="menu-screen hidden select-bg">
+        <div class="screen-header">
+          <h2 class="screen-title">ESCOLHA SEU GUERREIRO</h2>
+          <div class="screen-subtitle">SELECIONE SEU ANIMAL DE COMBATE</div>
+        </div>
+
+        <div class="select-container">
+          <!-- P1 Preview Card -->
+          <!-- P1 Preview Card -->
+          <div id="select-p1-card" class="char-preview-card p1-preview" onclick="window.gameEngine.setActivePicker('p1')">
+            <div class="preview-badge p1-badge">PLAYER 1</div>
+            <div class="preview-frame">
+              <img id="p1-preview-img" src="assets/images/portrait_dog.jpg" alt="P1">
+            </div>
+            <div class="preview-info">
+              <h3 id="p1-preview-name" class="preview-name">UNICÃO</h3>
+              <div id="p1-preview-title" class="preview-class">O Super Cão Cósmico</div>
+              <p id="p1-preview-bio" class="preview-bio">O lendário Super Cão com punhos cósmicos e força celestial.</p>
+              
+              <div class="preview-moves">
+                <div class="preview-move-row"><span class="move-pill esp-pill">ESP</span> <span id="p1-move-spec">Impacto Astral</span></div>
+                <div class="preview-move-row"><span class="move-pill sup-pill">SUPER</span> <span id="p1-move-super">Fúria Celestial do Super Cão</span></div>
+              </div>
+
+              <div class="stat-bars">
+                <div class="stat-row">
+                  <span>VIDA <b id="p1-stat-hp-val">1550</b></span>
+                  <div class="stat-track"><div id="p1-stat-hp" class="stat-fill stat-hp"></div></div>
+                </div>
+                <div class="stat-row">
+                  <span>ATAQUE <b id="p1-stat-atk-val">148%</b></span>
+                  <div class="stat-track"><div id="p1-stat-atk" class="stat-fill stat-atk"></div></div>
+                </div>
+                <div class="stat-row">
+                  <span>VELOCIDADE <b id="p1-stat-spd-val">6.0</b></span>
+                  <div class="stat-track"><div id="p1-stat-spd" class="stat-fill stat-spd"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Central Character Grid & Controls -->
+          <div class="select-center">
+            <div id="select-turn-indicator" class="select-turn-indicator">
+              <button id="tab-pick-p1" class="pick-tab active-p1" onclick="window.gameEngine.setActivePicker('p1')">🔴 ESCOLHER P1</button>
+              <button id="tab-pick-p2" class="pick-tab" onclick="window.gameEngine.setActivePicker('p2')">🔵 ESCOLHER P2</button>
+            </div>
+
+            <div id="char-grid" class="character-grid"></div>
+            
+            <div class="stage-select-box">
+              <label for="stage-dropdown">ARENA DE BATALHA:</label>
+              <select id="stage-dropdown" onchange="window.gameEngine.selectedStage = this.value">
+                <option value="street">Beco Urbano Neon</option>
+                <option value="swamp">Pântano dos Caimões</option>
+                <option value="bamboo">Bosque de Bambu Zen</option>
+                <option value="temple">Teto do Templo Sagrado</option>
+                <option value="servers">Data Center Matrix (Sala dos Servidores)</option>
+                <option value="dev_room">Web Dev Cyber Studio (Arena do Natã)</option>
+                <option value="ai_lab">Laboratório Quântico de IA (Arena do Andrey)</option>
+                <option value="volcano">Covil Vulcânico do Dragão</option>
+              </select>
+            </div>
+
+            <div class="select-keyboard-hint">
+              🎮 <b>WASD</b> ou <b>Setas</b> para navegar • <b>ENTER / ESPAÇO</b> para confirmar
+            </div>
+
+            <div class="select-actions">
+              <button class="arcade-btn btn-confirm" onclick="window.gameEngine.confirmFighterSelection()">
+                🔥 INICIAR COMBATE
+              </button>
+              <button class="arcade-btn-mini btn-back" onclick="window.gameEngine.returnToTitle()">
+                ⬅ VOLTAR AO MENU
+              </button>
+            </div>
+          </div>
+
+          <!-- P2 Preview Card (for PvP / Versus) -->
+          <div id="select-p2-card" class="char-preview-card p2-preview" onclick="window.gameEngine.setActivePicker('p2')">
+            <div class="preview-badge p2-badge">PLAYER 2 / CPU</div>
+            <div class="preview-frame">
+              <img id="p2-preview-img" src="assets/images/portrait_alligator.jpg" alt="P2">
+            </div>
+            <div class="preview-info">
+              <h3 id="p2-preview-name" class="preview-name">BRUTUS</h3>
+              <div id="p2-preview-title" class="preview-class">O Crocodilo do Pântano</div>
+              <p id="p2-preview-bio" class="preview-bio">Monstro brutal com mordida esmagadora.</p>
+
+              <div class="preview-moves">
+                <div class="preview-move-row"><span class="move-pill esp-pill">ESP</span> <span id="p2-move-spec">Giro da Morte</span></div>
+                <div class="preview-move-row"><span class="move-pill sup-pill">SUPER</span> <span id="p2-move-super">Mandíbula Titã</span></div>
+              </div>
+
+              <div class="stat-bars">
+                <div class="stat-row">
+                  <span>VIDA <b id="p2-stat-hp-val">1180</b></span>
+                  <div class="stat-track"><div id="p2-stat-hp" class="stat-fill stat-hp"></div></div>
+                </div>
+                <div class="stat-row">
+                  <span>ATAQUE <b id="p2-stat-atk-val">125%</b></span>
+                  <div class="stat-track"><div id="p2-stat-atk" class="stat-fill stat-atk"></div></div>
+                </div>
+                <div class="stat-row">
+                  <span>VELOCIDADE <b id="p2-stat-spd-val">4.2</b></span>
+                  <div class="stat-track"><div id="p2-stat-spd" class="stat-fill stat-spd"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARCADE QUEST PROLOGUE SCREEN -->
+      <div id="screen-prologue" class="menu-screen hidden prologue-bg">
+        <div class="prologue-card">
+          <div class="prologue-badge">★ JORNADA ARCADE • DESTINO SELADO ★</div>
+          <div class="prologue-content">
+            <div class="prologue-frame">
+              <img id="prologue-hero-img" src="assets/images/portrait_dog.jpg" alt="Herói">
+            </div>
+            <div class="prologue-text-box">
+              <h2 id="prologue-hero-name" class="prologue-hero-name">UNICÃO</h2>
+              <div id="prologue-hero-title" class="prologue-hero-title">O SUPER CÃO CÓSMICO</div>
+              <p id="prologue-story-text" class="prologue-story-text"></p>
+            </div>
+          </div>
+          <div class="prologue-actions">
+            <button class="arcade-btn btn-primary pulse-btn" onclick="window.gameEngine.startLadderFromPrologue()">
+              ⚔️ SUBIR A TORRE DE BATALHA ➔
+            </button>
+            <button class="arcade-btn-mini" onclick="window.gameEngine.openCharSelect(false)">
+              MUDAR PERSONAGEM
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARCADE TOWER LADDER SCREEN -->
+      <div id="screen-ladder" class="menu-screen hidden ladder-bg">
+        <div class="screen-header">
+          <h2 class="screen-title">TORRE DE BATALHA ANIMAL</h2>
+          <div class="screen-subtitle">DERROTE OS 8 GUERREIROS PARA ENFRENTAR O DRAGÃO BOSS</div>
+        </div>
+
+        <div id="ladder-stages" class="ladder-container"></div>
+
+        <div id="ladder-dialogue-box" class="ladder-dialogue-card">
+          <span class="dialogue-tag">CONFRONTO:</span>
+          <p id="ladder-dialogue-text">"Prepare-se para o combate!"</p>
+        </div>
+
+        <div class="ladder-actions">
+          <button id="ladder-start-btn" class="arcade-btn btn-primary pulse-btn">
+            ⚔️ ENFRENTAR OPONENTE!
+          </button>
+          <button class="arcade-btn-mini" onclick="window.gameEngine.returnToTitle()">
+            DESISTIR / MENU
+          </button>
+        </div>
+      </div>
+
+      <!-- STAGE CLEAR VICTORY CONFRONTATION SCREEN -->
+      <div id="screen-stage-clear" class="menu-screen hidden stage-clear-bg">
+        <div class="stage-clear-card">
+          <div class="stage-clear-badge">★ VITÓRIA NA FASE! ★</div>
+          <div class="stage-clear-duel">
+            <div class="stage-clear-fighter winner">
+              <img id="clear-hero-img" src="assets/images/portrait_dog.jpg" alt="Vencedor">
+              <span class="stage-badge win">VENCEDOR</span>
+            </div>
+            <div class="stage-clear-vs">VS</div>
+            <div class="stage-clear-fighter loser">
+              <img id="clear-opp-img" src="assets/images/portrait_alligator.jpg" alt="Derrotado">
+              <span class="stage-badge defeat">DERROTADO</span>
+            </div>
+          </div>
+          <div class="stage-clear-quote-box">
+            <div id="clear-hero-speaker" class="clear-speaker">UNICÃO:</div>
+            <p id="clear-quote-text" class="clear-quote">"Nunca subestime o Super Cão!"</p>
+          </div>
+          <button class="arcade-btn btn-primary pulse-btn" onclick="window.gameEngine.nextLadderStage()">
+            ⚔️ PRÓXIMA BATALHA ➔
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTINUE SCREEN -->
+      <div id="screen-continue" class="menu-screen hidden continue-bg">
+        <div class="continue-modal">
+          <h2 class="continue-title">VOCÊ FOI DERROTADO!</h2>
+          <div id="continue-defeat-box" class="continue-defeat-quote">
+            <div id="continue-taunt-speaker" class="taunt-speaker">OPONENTE:</div>
+            <p id="continue-taunt-text" class="taunt-text">"Você foi derrotado nas arenas!"</p>
+          </div>
+          <p class="continue-subtitle">DESEJA CONTINUAR SUA JORNADA?</p>
+          <div id="continue-num" class="continue-countdown">10</div>
+          <div class="continue-actions">
+            <button class="arcade-btn btn-primary" onclick="window.gameEngine.restartContinue()">
+              🔥 CONTINUAR (PRESS START)
+            </button>
+            <button class="arcade-btn-mini" onclick="window.gameEngine.openGameOver()">
+              DESISTIR
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAME OVER SCREEN -->
+      <div id="screen-gameover" class="menu-screen hidden gameover-bg">
+        <div class="gameover-box">
+          <h2 class="gameover-title">GAME OVER</h2>
+          <p class="gameover-text">Sua lenda foi encerrada nas arenas de Super Fighters.</p>
+          <button class="arcade-btn btn-primary" onclick="window.gameEngine.returnToTitle()">
+            VOLTAR AO MENU PRINCIPAL
+          </button>
+        </div>
+      </div>
+
+      <!-- VERSUS MATCH WINNER SCREEN -->
+      <div id="screen-versus-win" class="menu-screen hidden versus-win-bg">
+        <div class="versus-win-card">
+          <div class="versus-crown">👑 VITÓRIA SUPREMA 👑</div>
+          <div class="versus-portrait-frame">
+            <img id="versus-win-img" src="assets/images/portrait_dog.jpg" alt="Vencedor">
+          </div>
+          <h2 id="versus-win-text" class="versus-winner-name">UNICÃO É O VENCEDOR!</h2>
+          <div class="versus-actions">
+            <button class="arcade-btn btn-primary" onclick="window.gameEngine.startFight(window.gameEngine.selectedP1Char, window.gameEngine.selectedP2Char, window.gameEngine.selectedStage, window.gameEngine.p2.isCpu)">
+              🔄 REVANCHE IMEDIATA
+            </button>
+            <button class="arcade-btn-mini" onclick="window.gameEngine.openCharSelect(true)">
+              MUDAR PERSONAGENS
+            </button>
+            <button class="arcade-btn-mini" onclick="window.gameEngine.returnToTitle()">
+              MENU PRINCIPAL
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VICTORY ENDING EPILOGUE (DEFEATING DRAGON BOSS) -->
+      <div id="screen-ending" class="menu-screen hidden ending-bg">
+        <div class="ending-container">
+          <div class="ending-badge">★ CAMPEÃO MUNDIAL DE SUPER FIGHTERS ★</div>
+          <div class="ending-hero-display">
+            <div class="ending-frame">
+              <img id="ending-hero-img" src="assets/images/portrait_dog.jpg" alt="Campeão">
+            </div>
+            <div class="ending-text-box">
+              <h2 id="ending-hero-title" class="ending-hero-title">CAMPEÃO SUPREMO!</h2>
+              <div id="ending-story-text" class="ending-story-text">
+                História final de vitória épica!
+              </div>
+            </div>
+          </div>
+          <button class="arcade-btn btn-primary" onclick="window.gameEngine.returnToTitle()">
+            🏆 FINALIZAR E VOLTAR AO MENU
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTROLS & COMMANDS MODAL -->
+      <div id="screen-controls" class="modal-overlay hidden">
+        <div class="controls-card">
+          <div class="modal-header">
+            <h3>GUIA DE COMANDOS E COMBATES</h3>
+            <button class="close-btn" onclick="window.gameEngine.closeControlsModal()">✕</button>
+          </div>
+          
+          <div class="controls-grid">
+            <!-- Player 1 Controls -->
+            <div class="control-column">
+              <h4>🔴 PLAYER 1 (PADRÃO / SOLO)</h4>
+              <ul class="control-list">
+                <li><span class="key-badge">A</span> / <span class="key-badge">D</span> : Mover Esquerda / Direita</li>
+                <li><span class="key-badge">W</span> : Pular</li>
+                <li><span class="key-badge">S</span> : Agachar</li>
+                <li><span class="key-badge">A</span> (ou costas) : Bloquear Ataques</li>
+                <li><span class="key-badge">F</span> : Soco / Garra Rápida (Ataque Leve)</li>
+                <li><span class="key-badge">G</span> : Chute Pesado (Ataque Forte)</li>
+                <li><span class="key-badge">H</span> : Golpe Especial / Projétil</li>
+                <li><span class="key-badge">V</span> ou <span class="key-badge">ESPAÇO</span> : SUPER MOVE (Barra 100%)</li>
+              </ul>
+            </div>
+
+            <!-- Player 2 Controls -->
+            <div class="control-column">
+              <h4>🔵 PLAYER 2 (VERSUS LOCAL)</h4>
+              <ul class="control-list">
+                <li><span class="key-badge">◀</span> / <span class="key-badge">▶</span> : Mover Esquerda / Direita</li>
+                <li><span class="key-badge">▲</span> : Pular</li>
+                <li><span class="key-badge">▼</span> : Agachar</li>
+                <li><span class="key-badge">▶</span> (ou costas) : Bloquear Ataques</li>
+                <li><span class="key-badge">J</span> / <span class="key-badge">Num 1</span> : Soco / Ataque Leve</li>
+                <li><span class="key-badge">K</span> / <span class="key-badge">Num 2</span> : Chute / Ataque Forte</li>
+                <li><span class="key-badge">L</span> / <span class="key-badge">Num 3</span> : Golpe Especial</li>
+                <li><span class="key-badge">P</span> / <span class="key-badge">Enter</span> : SUPER MOVE (Barra 100%)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="controls-tips">
+            <strong>DICAS PRO:</strong> Acerte ataques normais e termine com o botão de Golpe Especial (<span class="key-badge">H</span>) para cancelar em combos devastadores! Encha sua barra de 100% para soltar o golpe supremo que causa dano colossal!<br>
+            <strong>PULO &amp; AGACHAMENTO:</strong> <span class="key-badge">W</span> + <span class="key-badge">F</span>/<span class="key-badge">G</span> no ar = ataque aéreo mergulhando ·
+            <span class="key-badge">S</span> + <span class="key-badge">F</span>/<span class="key-badge">G</span> = rasteira baixa ·
+            Agachado você desvia de projéteis · <span class="key-badge">S</span> + trás = defesa agachada!
+          </div>
+
+          <button class="arcade-btn btn-primary" onclick="window.gameEngine.closeControlsModal()">
+            ENTENDI, VAMOS LUTAR!
+          </button>
+        </div>
+      </div>
+
+      <!-- PAUSE MODAL -->
+      <div id="pause-modal" class="modal-overlay hidden">
+        <div class="pause-box">
+          <h2>JOGO PAUSADO</h2>
+          <div class="pause-buttons">
+            <button class="arcade-btn btn-primary" onclick="window.gameEngine.togglePause()">CONTINUAR</button>
+            <button class="arcade-btn-mini" onclick="window.gameEngine.openControlsModal()">VER CONTROLES</button>
+            <button class="arcade-btn-mini" onclick="window.gameEngine.togglePause(); window.gameEngine.returnToTitle()">SAIR PARA O MENU</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ON-SCREEN MOBILE VIRTUAL GAMEPAD -->
+      <div id="mobile-gamepad" class="mobile-gamepad-overlay hidden">
+        <div class="vpad-dpad">
+          <button class="vpad-btn vpad-up" data-key="KeyW" aria-label="Pular">▲</button>
+          <div class="vpad-dpad-middle">
+            <button class="vpad-btn vpad-left" data-key="KeyA" aria-label="Esquerda">◀</button>
+            <div class="vpad-center"></div>
+            <button class="vpad-btn vpad-right" data-key="KeyD" aria-label="Direita">▶</button>
+          </div>
+          <button class="vpad-btn vpad-down" data-key="KeyS" aria-label="Abaixar">▼</button>
+        </div>
+
+        <div class="vpad-actions">
+          <div class="vpad-row">
+            <button class="vpad-btn vpad-action vpad-atk-light" data-key="KeyF" aria-label="Soco">
+              <span class="vpad-txt">SOCO</span>
+              <span class="vpad-key">[F]</span>
+            </button>
+            <button class="vpad-btn vpad-action vpad-atk-heavy" data-key="KeyG" aria-label="Chute">
+              <span class="vpad-txt">CHUTE</span>
+              <span class="vpad-key">[G]</span>
+            </button>
+          </div>
+          <div class="vpad-row">
+            <button class="vpad-btn vpad-action vpad-special" data-key="KeyH" aria-label="Especial">
+              <span class="vpad-txt">ESPECIAL</span>
+              <span class="vpad-key">[H]</span>
+            </button>
+            <button class="vpad-btn vpad-action vpad-super" data-key="Space" aria-label="Super">
+              <span class="vpad-txt">★ SUPER</span>
+              <span class="vpad-key">[SPACE]</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ARCADE COMMANDS GUIDE BAR (ALWAYS VISIBLE BELOW SCREEN) -->
+    <div id="arcade-command-bar" class="arcade-command-bar">
+      <div class="cmd-group movement-group">
+        <span class="cmd-group-label">🕹️ MOVIMENTO P1:</span>
+        <div class="cmd-key-unit" onmousedown="triggerKey('KeyA', true)" onmouseup="triggerKey('KeyA', false)" onmouseleave="triggerKey('KeyA', false)" ontouchstart="triggerKey('KeyA', true)" ontouchend="triggerKey('KeyA', false)" title="A ou ◀ (Solo/Treino): Recuar / Bloquear">
+          <kbd class="key-badge">A / ◀</kbd> <span class="cmd-label">RECUAR</span>
+        </div>
+        <div class="cmd-key-unit" onmousedown="triggerKey('KeyD', true)" onmouseup="triggerKey('KeyD', false)" onmouseleave="triggerKey('KeyD', false)" ontouchstart="triggerKey('KeyD', true)" ontouchend="triggerKey('KeyD', false)" title="D ou ▶ (Solo/Treino): Avançar">
+          <kbd class="key-badge">D / ▶</kbd> <span class="cmd-label">AVANÇAR</span>
+        </div>
+        <div class="cmd-key-unit" onmousedown="triggerKey('KeyW', true)" onmouseup="triggerKey('KeyW', false)" onmouseleave="triggerKey('KeyW', false)" ontouchstart="triggerKey('KeyW', true)" ontouchend="triggerKey('KeyW', false)" title="W ou ▲ (Solo/Treino): Pular">
+          <kbd class="key-badge">W / ▲</kbd> <span class="cmd-label">PULAR</span>
+        </div>
+        <div class="cmd-key-unit" onmousedown="triggerKey('KeyS', true)" onmouseup="triggerKey('KeyS', false)" onmouseleave="triggerKey('KeyS', false)" ontouchstart="triggerKey('KeyS', true)" ontouchend="triggerKey('KeyS', false)" title="S ou ▼ (Solo/Treino): Agachar / Bloquear">
+          <kbd class="key-badge">S / ▼</kbd> <span class="cmd-label">AGACHAR</span>
+        </div>
+      </div>
+
+      <div class="cmd-group action-group">
+        <span class="cmd-group-label">⚔️ GOLPES P1:</span>
+        <button class="cmd-key-btn btn-soco" onclick="triggerKeyOnce('KeyF')" title="Tecla F: Soco Rápido">
+          <kbd class="key-badge key-punch">F</kbd> <span class="cmd-action-name">SOCO</span>
+        </button>
+        <button class="cmd-key-btn btn-chute" onclick="triggerKeyOnce('KeyG')" title="Tecla G: Chute Forte">
+          <kbd class="key-badge key-kick">G</kbd> <span class="cmd-action-name">CHUTE</span>
+        </button>
+        <button class="cmd-key-btn btn-especial" onclick="triggerKeyOnce('KeyH')" title="Tecla H: Especial / Hadouken">
+          <kbd class="key-badge key-spec">H</kbd> <span class="cmd-action-name">ESPECIAL</span>
+        </button>
+        <button class="cmd-key-btn btn-super" onclick="triggerKeyOnce('Space')" title="Barra de Espaço: Super Especial 100%">
+          <kbd class="key-badge key-super">ESPAÇO</kbd> <span class="cmd-action-name">★ SUPER</span>
+        </button>
+      </div>
+
+      <div class="cmd-group aux-group">
+        <button class="cmd-key-btn btn-aux" onclick="triggerKeyOnce('KeyP')" title="Tecla P: Pausar Combate">
+          <kbd class="key-badge">P</kbd> <span class="cmd-action-name">PAUSAR</span>
+        </button>
+        <button class="cmd-key-btn btn-aux" onclick="window.gameEngine.openControlsModal()" title="Ver tabela completa de golpes">
+          <span class="cmd-action-name">📖 GOLPES</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio helpers -->
+  <script>
+    function toggleAudioSfx(btn) {
+      if (window.soundEngine) {
+        const state = window.soundEngine.toggleSfx();
+        btn.innerText = state ? '🔊 SFX: LIGADO' : '🔇 SFX: MUTADO';
+      }
+    }
+    function toggleAudioMusic(btn) {
+      if (window.soundEngine) {
+        const state = window.soundEngine.toggleMusic();
+        btn.innerText = state ? '🎵 MÚSICA: LIGADA' : '🔇 MÚSICA: MUTADA';
+      }
+    }
+    function triggerKey(code, isDown) {
+      if (window.gameEngine) {
+        window.gameEngine.keys[code] = isDown;
+        if (!isDown) {
+          const keys = window.gameEngine.keys;
+          if (!keys['KeyA'] && !keys['KeyD'] && !keys['KeyS']) {
+            if (window.gameEngine.p1) window.gameEngine.p1.standUp();
+          }
+          if (!keys['ArrowLeft'] && !keys['ArrowRight'] && !keys['ArrowDown']) {
+            if (window.gameEngine.p2 && !window.gameEngine.p2.isCpu) window.gameEngine.p2.standUp();
+          }
+        }
+      }
+    }
+    function triggerKeyOnce(code) {
+      if (window.gameEngine) {
+        window.gameEngine.keys[code] = true;
+        window.gameEngine.handleInputs();
+        setTimeout(() => {
+          if (window.gameEngine) window.gameEngine.keys[code] = false;
+        }, 50);
+      }
+    }
+  </script>
+
+  <!-- Game Scripts in Sequence -->
+  <script src="js/audio.js"></script>
+  <script src="js/sprite_data.js"></script>
+  <script src="js/stories.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/stages.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/fighter.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
