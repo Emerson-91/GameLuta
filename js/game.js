@@ -11,7 +11,11 @@ class GameEngine {
     this.mode = 'solo';
     this.state = 'TITLE'; // TITLE, SELECT, LADDER, FIGHT, ROUND_OVER, MATCH_OVER, VICTORY_ENDING, CONTINUE
     this.selectedDifficulty = 'medium'; // 'easy', 'medium', 'hard', 'nightmare'
-    this.mobileControlsVisible = false;
+    this.isMobile = this.checkIsMobile();
+    this.mobileControlsVisible = this.isMobile;
+    if (this.isMobile) {
+      document.body.classList.add('is-mobile-device');
+    }
 
     // Fighters & AI
     this.p1 = null;
@@ -66,6 +70,9 @@ class GameEngine {
     this.setupMobileGamepad();
     this.resizeCanvas();
     window.addEventListener('resize', () => this.resizeCanvas());
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => this.resizeCanvas(), 100);
+    });
 
     // Start Client-Side Preloader & Intro Video
     this.initPreloader();
@@ -75,14 +82,38 @@ class GameEngine {
     requestAnimationFrame((t) => this.gameLoop(t));
   }
 
+  checkIsMobile() {
+    const ua = navigator.userAgent || '';
+    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const isNarrow = window.innerWidth <= 900;
+    return mobileRegex.test(ua) || (hasTouch && isNarrow);
+  }
+
   resizeCanvas() {
-    // Keep 16:9 ratio
     const container = document.getElementById('game-container');
     if (!container) return;
-    const maxWidth = Math.min(window.innerWidth - 20, 1100);
-    const height = (maxWidth * 9) / 16;
-    container.style.width = `${maxWidth}px`;
-    container.style.height = `${height}px`;
+    const winW = window.innerWidth;
+    const winH = window.innerHeight;
+    const isMobile = this.isMobile || this.checkIsMobile();
+
+    // Keep strict 16:9 ratio fitted to viewport
+    let targetW = winW;
+    let targetH = (targetW * 9) / 16;
+
+    if (targetH > winH) {
+      targetH = winH;
+      targetW = (targetH * 16) / 9;
+    }
+
+    // On desktop, limit maximum bounds for classic arcade cabinet look
+    if (!isMobile && targetW > 1100) {
+      targetW = 1100;
+      targetH = (targetW * 9) / 16;
+    }
+
+    container.style.width = `${Math.floor(targetW)}px`;
+    container.style.height = `${Math.floor(targetH)}px`;
   }
 
   initEventListeners() {
@@ -222,12 +253,166 @@ class GameEngine {
     const vpad = document.getElementById('mobile-gamepad');
     if (!vpad) return;
 
-    // Detect touch device or narrow screen
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 850);
-    if (isTouch) {
+    if (this.isMobile) {
       this.mobileControlsVisible = true;
     }
 
+    // ==========================================
+    // 1. TOUCH ANALOG JOYSTICK (Virtual Thumbstick)
+    // ==========================================
+    const zone = document.getElementById('vpad-analog-zone');
+    const base = document.getElementById('vpad-analog-base');
+    const stick = document.getElementById('vpad-analog-stick');
+
+    if (base && stick) {
+      let touchId = null;
+      let isDragging = false;
+      let baseRect = null;
+      let centerX = 0;
+      let centerY = 0;
+      let maxRadius = 45;
+
+      const updateCenter = () => {
+        baseRect = base.getBoundingClientRect();
+        centerX = baseRect.left + baseRect.width / 2;
+        centerY = baseRect.top + baseRect.height / 2;
+        maxRadius = baseRect.width * 0.38;
+      };
+
+      const handleMove = (clientX, clientY) => {
+        if (!centerX || !centerY) updateCenter();
+        const dx = clientX - centerX;
+        const dy = clientY - centerY;
+        const dist = Math.hypot(dx, dy);
+        const angle = Math.atan2(dy, dx);
+
+        const clampedDist = Math.min(dist, maxRadius);
+        const clampX = Math.cos(angle) * clampedDist;
+        const clampY = Math.sin(angle) * clampedDist;
+
+        stick.style.transform = `translate3d(${clampX}px, ${clampY}px, 0)`;
+        base.classList.add('stick-active');
+
+        // Directional Thresholds
+        const deadzone = maxRadius * 0.22;
+        if (dist > deadzone) {
+          const hThreshold = maxRadius * 0.28;
+          const vThreshold = maxRadius * 0.32;
+
+          // Horizontal Direction
+          if (dx < -hThreshold) {
+            this.keys['KeyA'] = true;
+            this.keys['KeyD'] = false;
+          } else if (dx > hThreshold) {
+            this.keys['KeyD'] = true;
+            this.keys['KeyA'] = false;
+          } else {
+            this.keys['KeyA'] = false;
+            this.keys['KeyD'] = false;
+          }
+
+          // Vertical Direction
+          if (dy < -vThreshold) {
+            this.keys['KeyW'] = true;
+            this.keys['KeyS'] = false;
+          } else if (dy > vThreshold) {
+            this.keys['KeyS'] = true;
+            this.keys['KeyW'] = false;
+          } else {
+            this.keys['KeyW'] = false;
+            this.keys['KeyS'] = false;
+          }
+        } else {
+          this.keys['KeyA'] = false;
+          this.keys['KeyD'] = false;
+          this.keys['KeyW'] = false;
+          this.keys['KeyS'] = false;
+          if (this.p1 && this.p1.state === 'CROUCH') {
+            this.p1.standUp();
+          }
+        }
+      };
+
+      const handleRelease = () => {
+        touchId = null;
+        isDragging = false;
+        stick.style.transform = 'translate3d(0, 0, 0)';
+        base.classList.remove('stick-active');
+        this.keys['KeyA'] = false;
+        this.keys['KeyD'] = false;
+        this.keys['KeyW'] = false;
+        this.keys['KeyS'] = false;
+        if (this.p1) {
+          this.p1.standUp();
+        }
+      };
+
+      // Touch Events for Analog Stick
+      const onTouchStart = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        updateCenter();
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          touchId = t.identifier;
+          isDragging = true;
+          handleMove(t.clientX, t.clientY);
+          break;
+        }
+      };
+
+      const onTouchMove = (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        e.stopPropagation();
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          if (t.identifier === touchId) {
+            handleMove(t.clientX, t.clientY);
+            break;
+          }
+        }
+      };
+
+      const onTouchEnd = (e) => {
+        if (!isDragging) return;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === touchId) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleRelease();
+            break;
+          }
+        }
+      };
+
+      const touchTarget = zone || base;
+      touchTarget.addEventListener('touchstart', onTouchStart, { passive: false });
+      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('touchend', onTouchEnd, { passive: false });
+      window.addEventListener('touchcancel', onTouchEnd, { passive: false });
+
+      // Mouse Events for desktop emulation / testing
+      touchTarget.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        updateCenter();
+        handleMove(e.clientX, e.clientY);
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (isDragging && touchId === null) {
+          handleMove(e.clientX, e.clientY);
+        }
+      });
+      window.addEventListener('mouseup', () => {
+        if (isDragging && touchId === null) {
+          handleRelease();
+        }
+      });
+    }
+
+    // ==========================================
+    // 2. ARCADE ACTION BUTTONS (Multi-touch)
+    // ==========================================
     const buttons = vpad.querySelectorAll('.vpad-btn');
     buttons.forEach((btn) => {
       const code = btn.dataset.key;
@@ -238,6 +423,11 @@ class GameEngine {
         e.stopPropagation();
         this.keys[code] = true;
         btn.classList.add('active');
+
+        // Tactile vibration feedback on mobile
+        if (navigator.vibrate) {
+          try { navigator.vibrate(12); } catch (_) {}
+        }
 
         // Immediate trigger for action keys
         if (['KeyF', 'KeyG', 'KeyH', 'Space'].includes(code)) {

@@ -2,7 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#07090e">
   <title>SUPER FIGHTERS COMBAT - Jogo de Luta Arcade</title>
   <meta name="description" content="Jogo de luta 2D estilo Street Fighter e Mortal Kombat com guerreiros lendários. Modo Solo com Torre Arcade e Dragão Boss Final, ou Versus 1v1 local!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,7 +52,10 @@
         <div class="hud-center">
           <div id="match-timer" class="match-timer">99</div>
           <div class="arcade-sub">ROUND</div>
-          <button id="btn-touch-toggle" class="hud-touch-toggle" onclick="window.gameEngine.toggleMobileControls()">CONTROLES</button>
+          <div class="hud-mobile-ctrls">
+            <button id="btn-touch-toggle" class="hud-touch-toggle" onclick="window.gameEngine.toggleMobileControls()">CONTROLES</button>
+            <button id="btn-touch-pause" class="hud-touch-pause" onclick="window.gameEngine.togglePause()">PAUSAR</button>
+          </div>
         </div>
 
         <!-- P2 HUD Info -->
@@ -510,20 +517,34 @@
         </div>
       </div>
 
-      <!-- ON-SCREEN MOBILE VIRTUAL GAMEPAD -->
+      <!-- ON-SCREEN MOBILE VIRTUAL GAMEPAD (ANALOG JOYSTICK + ACTION BUTTONS) -->
       <div id="mobile-gamepad" class="mobile-gamepad-overlay hidden">
-        <div class="vpad-dpad">
-          <button class="vpad-btn vpad-up" data-key="KeyW" aria-label="Pular">▲</button>
-          <div class="vpad-dpad-middle">
-            <button class="vpad-btn vpad-left" data-key="KeyA" aria-label="Esquerda">◀</button>
-            <div class="vpad-center"></div>
-            <button class="vpad-btn vpad-right" data-key="KeyD" aria-label="Direita">▶</button>
+        <!-- Virtual Analog Joystick on the Left -->
+        <div class="vpad-analog-zone" id="vpad-analog-zone">
+          <div class="vpad-analog-base" id="vpad-analog-base">
+            <div class="vpad-analog-cross">
+              <span class="vpad-analog-arrow arrow-u">▲</span>
+              <span class="vpad-analog-arrow arrow-d">▼</span>
+              <span class="vpad-analog-arrow arrow-l">◀</span>
+              <span class="vpad-analog-arrow arrow-r">▶</span>
+            </div>
+            <div class="vpad-analog-stick" id="vpad-analog-stick">
+              <div class="vpad-analog-knob">
+                <div class="vpad-analog-core"></div>
+              </div>
+            </div>
           </div>
-          <button class="vpad-btn vpad-down" data-key="KeyS" aria-label="Abaixar">▼</button>
+          <div class="vpad-analog-label">ANALÓGICO</div>
         </div>
 
+        <!-- Center Mobile Quick Actions (Pause / Fullscreen) -->
+        <div class="vpad-center-utils">
+          <button class="vpad-util-btn" onclick="window.gameEngine.togglePause()" aria-label="Pausar Combate">PAUSAR</button>
+        </div>
+
+        <!-- Action Buttons on the Right (Arcade Diamond Cluster) -->
         <div class="vpad-actions">
-          <div class="vpad-row">
+          <div class="vpad-action-cluster">
             <button class="vpad-btn vpad-action vpad-atk-light" data-key="KeyF" aria-label="Soco">
               <span class="vpad-txt">SOCO</span>
               <span class="vpad-key">[F]</span>
@@ -532,15 +553,13 @@
               <span class="vpad-txt">CHUTE</span>
               <span class="vpad-key">[G]</span>
             </button>
-          </div>
-          <div class="vpad-row">
             <button class="vpad-btn vpad-action vpad-special" data-key="KeyH" aria-label="Especial">
               <span class="vpad-txt">ESPECIAL</span>
               <span class="vpad-key">[H]</span>
             </button>
             <button class="vpad-btn vpad-action vpad-super" data-key="Space" aria-label="Super">
               <span class="vpad-txt">SUPER</span>
-              <span class="vpad-key">[SPACE]</span>
+              <span class="vpad-key">[MAX]</span>
             </button>
           </div>
         </div>

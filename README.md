@@ -62,10 +62,16 @@ Todos os menus podem ser navegados diretamente pelo teclado via **WASD** ou **Se
 | **Golpe Especial** | `L` *(Consome 50% de energia)* | `Numpad 6` |
 | **Super Golpe** | `Enter` *(Consome 100% de energia)* | `Numpad 0` |
 
-### Comandos de Sistema
+### Controles Mobile (Dispositivos Móveis e Telas Touch)
 
-- **Pausar Partida**: `Esc` ou `P`
-- **Alternar Controles Touch / Virtuais**: Botão `CONTROLES` no topo da tela ou pelo menu.
+Ao abrir em celulares ou telas sensíveis ao toque, o jogo detecta automaticamente e ativa o layout de controle virtual arcade:
+- **Analógico Virtual (Esquerda)**: Thumbstick deslizável com retorno elástico ao centro. Arraste para os lados para andar/recuar/defender, para cima para pular, para baixo para agachar, e diagonais para saltar em movimento.
+- **Botões de Ação (Direita)**:
+  - **SOCO**: Ataque leve e rápido.
+  - **CHUTE**: Ataque pesado de maior alcance.
+  - **ESPECIAL**: Dispara a magia/habilidade do lutador (50% de energia).
+  - **SUPER**: Desfere o golpe supremo devastador (100% de energia).
+- **Botões Rápidos**: Botão `PAUSAR` e `CONTROLES` no HUD superior e no centro da tela.
 
 ---
 
