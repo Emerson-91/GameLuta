@@ -62,6 +62,14 @@ Todos os menus podem ser navegados diretamente pelo teclado via **WASD** ou **Se
 | **Golpe Especial** | `L` *(Consome 50% de energia)* | `Numpad 6` |
 | **Super Golpe** | `Enter` *(Consome 100% de energia)* | `Numpad 0` |
 
+### Menu START e Gestão da Partida
+
+| Ação | Tecla | Onde Encontrar |
+| :--- | :--- | :--- |
+| **Menu START (Pausa & Opções)** | `P` ou `Esc` | Botão **START** no HUD, no gamepad virtual mobile e na barra inferior |
+| **Reiniciar Partida Atual** | `W/S` + `Enter` ou `R` | Opção destacada **REINICIAR PARTIDA** dentro do **Menu START** (ou tecla direta `R`) |
+| **Tabela de Golpes** | `GOLPES` | Opção no **Menu START** e botão na barra inferior |
+
 ### Controles Mobile (Dispositivos Móveis e Telas Touch)
 
 Ao abrir em celulares ou telas sensíveis ao toque, o jogo detecta automaticamente e ativa o layout de controle virtual arcade:
@@ -71,7 +79,7 @@ Ao abrir em celulares ou telas sensíveis ao toque, o jogo detecta automaticamen
   - **CHUTE**: Ataque pesado de maior alcance.
   - **ESPECIAL**: Dispara a magia/habilidade do lutador (50% de energia).
   - **SUPER**: Desfere o golpe supremo devastador (100% de energia).
-- **Botões Rápidos**: Botão `PAUSAR` e `CONTROLES` no HUD superior e no centro da tela.
+- **Botões Rápidos**: Botões `START`, `TELA CHEIA` e `CONTROLES` para abrir o menu da partida sem poluir a luta.
 
 
 ---

@@ -79,7 +79,7 @@
           <div class="hud-mobile-ctrls">
             <button id="btn-touch-toggle" class="hud-touch-toggle" onclick="window.gameEngine.toggleMobileControls()">CONTROLES</button>
             <button id="btn-touch-fullscreen" class="hud-touch-toggle" onclick="window.gameEngine.toggleFullscreen()">TELA CHEIA</button>
-            <button id="btn-touch-pause" class="hud-touch-pause" onclick="window.gameEngine.togglePause()">PAUSAR</button>
+            <button id="btn-touch-pause" class="hud-touch-pause" onclick="window.gameEngine.togglePause()" title="Menu START / Pausar">START</button>
           </div>
         </div>
 
@@ -533,17 +533,18 @@
         </div>
       </div>
 
-      <!-- PAUSE MODAL -->
+      <!-- PAUSE / START MODAL -->
       <div id="pause-modal" class="modal-overlay hidden">
         <div class="pause-box">
-          <h2>JOGO PAUSADO</h2>
+          <h2>MENU START</h2>
           <div class="pause-buttons">
             <button class="arcade-btn btn-primary" onclick="window.gameEngine.togglePause()">CONTINUAR</button>
+            <button class="arcade-btn btn-restart-pause" onclick="window.gameEngine.restartCurrentMatch()">REINICIAR PARTIDA</button>
             <button class="arcade-btn-mini" onclick="window.gameEngine.openControlsModal()">VER CONTROLES</button>
             <button class="arcade-btn-mini" onclick="window.gameEngine.togglePause(); window.gameEngine.returnToTitle()">SAIR PARA O MENU</button>
           </div>
           <div class="menu-keyboard-hint">
-            <b>W / S</b> para navegar • <b>ENTER</b> para confirmar • <b>P / ESC</b> voltar
+            <b>W / S</b> para navegar • <b>ENTER</b> para confirmar • <b>START / P / ESC</b> voltar
           </div>
         </div>
       </div>
@@ -568,10 +569,10 @@
           <div class="vpad-analog-label">ANALÓGICO</div>
         </div>
 
-        <!-- Center Mobile Quick Actions (Fullscreen & Pause) -->
+        <!-- Center Mobile Quick Actions (START & Fullscreen) -->
         <div class="vpad-center-utils">
+          <button class="vpad-util-btn vpad-btn-start" onclick="window.gameEngine.togglePause()" aria-label="Menu Start">START</button>
           <button class="vpad-util-btn btn-util-fs" onclick="window.gameEngine.toggleFullscreen()" aria-label="Tela Cheia">TELA CHEIA</button>
-          <button class="vpad-util-btn" onclick="window.gameEngine.togglePause()" aria-label="Pausar Combate">PAUSAR</button>
         </div>
 
         <!-- Action Buttons on the Right (Arcade Diamond Cluster) -->
@@ -634,8 +635,8 @@
       </div>
 
       <div class="cmd-group aux-group">
-        <button class="cmd-key-btn btn-aux" onclick="triggerKeyOnce('KeyP')" title="Tecla P: Pausar Combate">
-          <kbd class="key-badge">P</kbd> <span class="cmd-action-name">PAUSAR</span>
+        <button class="cmd-key-btn btn-aux btn-start-bar" onclick="triggerKeyOnce('KeyP')" title="Menu START / Pausar Combate">
+          <kbd class="key-badge">START / P</kbd> <span class="cmd-action-name">MENU</span>
         </button>
         <button class="cmd-key-btn btn-aux" onclick="window.gameEngine.openControlsModal()" title="Ver tabela completa de golpes">
           <span class="cmd-action-name">GOLPES</span>

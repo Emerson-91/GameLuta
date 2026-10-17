@@ -177,6 +177,13 @@ class GameEngine {
         }
       }
 
+      // Restart current match shortcut (KeyR) during fight, pause, or match over
+      if (e.code === 'KeyR' && (this.state === 'FIGHT' || this.isPaused || this.state === 'MATCH_OVER')) {
+        e.preventDefault();
+        this.restartCurrentMatch();
+        return;
+      }
+
       // In FIGHT state and not paused:
       if (this.state === 'FIGHT' && !this.isPaused) {
         // Pause toggle
@@ -1228,11 +1235,66 @@ class GameEngine {
     };
   }
 
+  restartCurrentMatch() {
+    const cfg = this.currentMatchConfig || (this.p1 && this.p2 ? {
+      p1Char: this.p1.charKey,
+      p2Char: this.p2.charKey,
+      stageKey: (window.stageManager && window.stageManager.currentStageKey) || this.selectedStage || 'dojo',
+      isCpu: this.p2.isCpu
+    } : null);
+
+    if (!cfg) return;
+
+    if (this.isPaused) {
+      this.isPaused = false;
+      const pauseMenu = document.getElementById('pause-modal');
+      if (pauseMenu) pauseMenu.classList.add('hidden');
+    }
+
+    const controlsModal = document.getElementById('screen-controls');
+    if (controlsModal) controlsModal.classList.add('hidden');
+    this.openedControlsFromPause = false;
+
+    const versusWinScreen = document.getElementById('screen-versus-win');
+    if (versusWinScreen) versusWinScreen.classList.add('hidden');
+
+    const gameoverScreen = document.getElementById('screen-gameover');
+    if (gameoverScreen) gameoverScreen.classList.add('hidden');
+
+    const continueScreen = document.getElementById('screen-continue');
+    if (continueScreen) continueScreen.classList.add('hidden');
+
+    if (this.continueInterval) {
+      clearInterval(this.continueInterval);
+      this.continueInterval = null;
+    }
+
+    if (this.roundStartTimeout) {
+      clearTimeout(this.roundStartTimeout);
+      this.roundStartTimeout = null;
+    }
+
+    if (window.soundEngine) {
+      window.soundEngine.playConfirm();
+    }
+
+    this.startFight(cfg.p1Char, cfg.p2Char, cfg.stageKey, cfg.isCpu);
+  }
+
   startFight(p1Char, p2Char, stageKey, isCpu = true) {
+    this.currentMatchConfig = { p1Char, p2Char, stageKey, isCpu };
     this.state = 'FIGHT';
+    this.isPaused = false;
+    const pauseMenu = document.getElementById('pause-modal');
+    if (pauseMenu) pauseMenu.classList.add('hidden');
     this.resetKeys();
     this.hideAllScreens();
     document.getElementById('hud').classList.remove('hidden');
+
+    if (this.roundStartTimeout) {
+      clearTimeout(this.roundStartTimeout);
+      this.roundStartTimeout = null;
+    }
 
     // Show mobile virtual gamepad if enabled
     const vpad = document.getElementById('mobile-gamepad');
@@ -1300,7 +1362,10 @@ class GameEngine {
     window.soundEngine.playRoundStart();
     window.uiManager.showBanner(roundText, subText, 60, '#ef4444');
 
-    setTimeout(() => {
+    if (this.roundStartTimeout) {
+      clearTimeout(this.roundStartTimeout);
+    }
+    this.roundStartTimeout = setTimeout(() => {
       if (this.state === 'FIGHT') {
         window.soundEngine.playConfirm();
         window.uiManager.showBanner(this.mode === 'training' ? 'TREINAR!' : 'LUTEM!', '', 50, '#f59e0b');

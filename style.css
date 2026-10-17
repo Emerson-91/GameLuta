@@ -290,6 +290,29 @@ body {
   background: #1e293b;
 }
 
+.arcade-btn.btn-restart-pause {
+  background: linear-gradient(180deg, #78350f, #d97706);
+  border: 1px solid #fbbf24;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+  font-family: var(--font-arcade);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.arcade-btn.btn-restart-pause:hover,
+.arcade-btn.btn-restart-pause.focused {
+  background: linear-gradient(180deg, #b45309, #f59e0b);
+  border-color: #fef08a;
+  color: #0f172a;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.7);
+  transform: translateY(-2px);
+}
+
 /* HUD STYLING */
 .hud-overlay {
   position: absolute;
@@ -1373,6 +1396,22 @@ body {
   color: #94a3b8;
 }
 
+.btn-start-bar {
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  color: #fbbf24 !important;
+}
+
+.btn-start-bar .key-badge {
+  background: #f59e0b !important;
+  color: #0f172a !important;
+  font-weight: 800;
+}
+
+.btn-start-bar:hover {
+  background: rgba(245, 158, 11, 0.2) !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+}
+
 @keyframes superPulse {
   0% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.2); }
   100% { box-shadow: 0 0 16px rgba(245, 158, 11, 0.55); }
@@ -1687,6 +1726,18 @@ body {
   color: #fff;
 }
 
+.hud-touch-toggle.btn-restart-hud {
+  border-color: #f59e0b;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.hud-touch-toggle.btn-restart-hud:hover,
+.hud-touch-toggle.btn-restart-hud:active {
+  background: #f59e0b;
+  color: #0f172a;
+}
+
 /* ==========================================================================
    MOBILE VIRTUAL GAMEPAD (TOUCH CONTROLS)
    ========================================================================== */
@@ -1818,6 +1869,28 @@ body {
 .vpad-center-utils {
   pointer-events: auto;
   margin-bottom: 6px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.vpad-util-btn.vpad-btn-start {
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  border: 1px solid #f59e0b;
+  color: #fbbf24;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 5px 14px;
+  border-radius: 14px;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+.vpad-util-btn.vpad-btn-start:hover,
+.vpad-util-btn.vpad-btn-start:active {
+  background: #f59e0b;
+  color: #0f172a;
+  border-color: #fde047;
 }
 
 .vpad-util-btn {

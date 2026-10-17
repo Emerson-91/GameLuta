@@ -496,7 +496,7 @@ const CHARACTERS = {
   }
 };
 
-const SPRITE_POSES = ['idle', 'idle2', 'punch', 'kick', 'special', 'special1', 'special2', 'super', 'crouch', 'jump', 'fall', 'fly', 'fly2', 'walk1', 'walk2', 'back1', 'back2', 'knockdown', 'victory', 'victory1', 'victory2', 'victory3', 'victory4', 'victory5'];
+const SPRITE_POSES = ['idle', 'idle2', 'punch', 'kick', 'special', 'special1', 'special2', 'super', 'crouch', 'jump', 'fall', 'fly', 'fly2', 'walk1', 'walk2', 'back1', 'back2', 'knockdown', 'victory', 'victory1', 'victory2', 'victory3', 'victory4', 'victory5', 'victory6'];
 const fighterSprites = {};
 Object.keys(CHARACTERS).forEach(id => {
   if (!window.SPRITE_META || !window.SPRITE_META[id]) return;
@@ -598,6 +598,15 @@ function pickSpritePose(f) {
       if (vt < 76) return 'victory3';
       if (vt < 112) return 'victory4';
       return 'victory5';
+    }
+    if (f.charId === 'dragon') {
+      const vt = f.stateTimer || 0;
+      if (vt < 22) return 'victory1';
+      if (vt < 46) return 'victory2';
+      if (vt < 72) return 'victory3';
+      if (vt < 98) return 'victory4';
+      if (vt < 126) return 'victory5';
+      return 'victory6';
     }
   }
   if (s === 'KNOCKDOWN' || s === 'DEFEAT') {
@@ -766,11 +775,13 @@ function drawFighterSprite(ctx, fighter) {
     rot = Math.sin(t * 0.08) * 0.03 + Math.max(-0.25, Math.min(0.25, fighter.vx * 0.04));
     sy = 1 + Math.sin(t * 0.22) * 0.025;
   } else if (state === 'IDLE' || state === 'VICTORY') {
-    if (state === 'VICTORY' && (fighter.charId === 'emerson' || fighter.charId === 'andrey' || fighter.charId === 'alligator' || fighter.charId === 'bear' || fighter.charId === 'capybara' || fighter.charId === 'nata' || fighter.charId === 'cat' || fighter.charId === 'dog' || fighter.charId === 'gorilla' || fighter.charId === 'tiger' || fighter.charId === 'wolf')) {
+    if (state === 'VICTORY' && (fighter.charId === 'emerson' || fighter.charId === 'andrey' || fighter.charId === 'alligator' || fighter.charId === 'bear' || fighter.charId === 'capybara' || fighter.charId === 'nata' || fighter.charId === 'cat' || fighter.charId === 'dog' || fighter.charId === 'gorilla' || fighter.charId === 'tiger' || fighter.charId === 'wolf' || fighter.charId === 'dragon')) {
       offY = 0;
       sy = 1;
       sx = 1;
-      if (pose === 'victory4' && fighter.charId === 'emerson') {
+      if (pose === 'victory6' && fighter.charId === 'dragon') {
+        offX = (Math.random() - 0.5) * 2; // primordial dragon roar vibration
+      } else if (pose === 'victory4' && fighter.charId === 'emerson') {
         offX = (Math.random() - 0.5) * 2; // subtle electric aura vibration
       } else if (pose === 'victory5' && fighter.charId === 'andrey') {
         offX = (Math.random() - 0.5) * 2; // cybernetic core vibration
