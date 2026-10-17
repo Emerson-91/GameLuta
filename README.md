@@ -72,7 +72,7 @@ Ao abrir em celulares ou telas sensíveis ao toque, o jogo detecta automaticamen
   - **ESPECIAL**: Dispara a magia/habilidade do lutador (50% de energia).
   - **SUPER**: Desfere o golpe supremo devastador (100% de energia).
 - **Botões Rápidos**: Botão `PAUSAR` e `CONTROLES` no HUD superior e no centro da tela.
-- **Segredo do Chefão Vulcanus (Apenas Celular)**: Pressione o botão **ESPECIAL** 5 vezes consecutivas para desbloquear e jogar com o chefão final **Vulcanus** (no computador, digite `boss` no teclado).
+
 
 ---
 
