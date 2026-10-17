@@ -4,21 +4,21 @@ const CHARACTERS = {
   dog: {
     id: 'dog',
     name: 'Unicão',
-    title: 'O Super Cão Cósmico (Força Celestial)',
-    lore: 'O lendário guerreiro canino de pelagem azul cósmica e músculos de titã. Mestre absoluto do boxe celestial e da fúria cósmica: o Super Cão carrega em cada golpe o impacto de uma estrela!',
+    title: 'O Super Cão Cósmico',
+    lore: 'O lendário guerreiro canino de pelagem azul cósmica. Mestre do boxe celestial e da fúria cósmica, canaliza a energia das estrelas em golpes rápidos e precisos!',
     portrait: 'assets/images/portrait_dog.jpg',
-    baseHp: 1550, // MUITO FORTE!
-    speed: 6.0,
-    power: 1.48, // Socos titânicos
-    defense: 1.30, // Couraça celestial
-    jumpForce: 15.5,
+    baseHp: 1000,
+    speed: 5.5,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 15.2,
     themeColor: '#0284c7',
     auraColor: 'rgba(56, 189, 248, 0.55)',
     projectileType: 'bone_blast',
     specialName: 'Impacto Astral',
     superName: 'Fúria Celestial do Super Cão',
-    width: 65,
-    height: 115,
+    width: 68,
+    height: 116,
     colors: {
       fur: '#0284c7',
       furDark: '#0c4a6e',
@@ -45,18 +45,18 @@ const CHARACTERS = {
     title: 'O Crocodilo do Pântano',
     lore: 'O monstro brutal dos pântanos escuros, com dentes afiados e uma força de mandíbula capaz de quebrar ossos.',
     portrait: 'assets/images/portrait_alligator.jpg',
-    baseHp: 1180,
-    speed: 4.2,
-    power: 1.25,
-    defense: 1.15,
-    jumpForce: 15.2,
+    baseHp: 1000,
+    speed: 4.4,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 15.0,
     themeColor: '#16a34a',
     auraColor: 'rgba(22, 163, 74, 0.4)',
     projectileType: 'mud_splash',
     specialName: 'Giro da Morte',
     superName: 'Mandíbula de Titã',
-    width: 75,
-    height: 118,
+    width: 68,
+    height: 116,
     colors: {
       fur: '#15803d',
       furDark: '#14532d',
@@ -83,18 +83,18 @@ const CHARACTERS = {
     title: 'A Capivara Zen',
     lore: 'O mestre da serenidade absoluta. Seu foco interior canaliza rajadas de Chi devastadoras.',
     portrait: 'assets/images/portrait_capybara.jpg',
-    baseHp: 1050,
+    baseHp: 1000,
     speed: 4.8,
     power: 1.0,
-    defense: 1.2,
+    defense: 1.0,
     jumpForce: 15.0,
     themeColor: '#f59e0b',
     auraColor: 'rgba(245, 158, 11, 0.4)',
     projectileType: 'zen_orb',
     specialName: 'Esfera de Chi',
     superName: 'Iluminação Devastadora',
-    width: 70,
-    height: 110,
+    width: 68,
+    height: 116,
     colors: {
       fur: '#b45309',
       furDark: '#78350f',
@@ -121,18 +121,17 @@ const CHARACTERS = {
     title: 'A Coruja Shinobi',
     lore: 'Assassina silenciosa da noite que domina o ar e arremessa penas afiadas como shurikens mortais.',
     portrait: 'assets/images/portrait_owl.jpg',
-    baseHp: 900,
-    speed: 6.2,
-    power: 0.95,
-    defense: 0.9,
-    jumpForce: 16.0,
+    baseHp: 1000,
+    speed: 6.0,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 15.8,
     themeColor: '#8b5cf6',
-    auraColor: 'rgba(139, 92, 246, 0.4)',
-    projectileType: 'feather_blade',
-    specialName: 'Shuriken de Penas',
-    superName: 'Tempestade da Meia-Noite',
-    width: 60,
-    height: 110,
+    projectileType: 'tornado',
+    specialName: 'Tornado Shinobi',
+    superName: 'Tempestade de Penas Ninja',
+    width: 68,
+    height: 116,
     colors: {
       fur: '#3730a3',
       furDark: '#1e1b4b',
@@ -159,11 +158,11 @@ const CHARACTERS = {
     title: 'O Tigre das Lâminas',
     lore: 'Predador feroz que fatiará qualquer oponente com suas garras de aço e velocidade explosiva.',
     portrait: 'assets/images/portrait_tiger.jpg',
-    baseHp: 980,
-    speed: 5.8,
-    power: 1.15,
-    defense: 0.95,
-    jumpForce: 14.8,
+    baseHp: 1000,
+    speed: 5.6,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 15.0,
     themeColor: '#06b6d4',
     auraColor: 'rgba(6, 182, 212, 0.4)',
     projectileType: 'claw_wave',
@@ -197,18 +196,18 @@ const CHARACTERS = {
     title: 'O Berserker do Ártico',
     lore: 'Uma força colateral da natureza. Seus golpes esmagam montanhas e causam abalos sísmicos.',
     portrait: 'assets/images/portrait_bear.jpg',
-    baseHp: 1250,
-    speed: 3.8,
-    power: 1.35,
-    defense: 1.25,
-    jumpForce: 15.0,
+    baseHp: 1000,
+    speed: 4.0,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 14.8,
     themeColor: '#38bdf8',
     auraColor: 'rgba(56, 189, 248, 0.4)',
     projectileType: 'ice_spike',
     specialName: 'Pancada Sísmica',
     superName: 'Terremoto Glacial',
-    width: 82,
-    height: 122,
+    width: 68,
+    height: 116,
     colors: {
       fur: '#451a03',
       furDark: '#1c0a00',
@@ -235,18 +234,18 @@ const CHARACTERS = {
     title: 'O Titã Primata',
     lore: 'Punhos pesados como ferro fundido. Um brawler implacável que arremessa pedras gigantes.',
     portrait: 'assets/images/portrait_gorilla.jpg',
-    baseHp: 1100,
+    baseHp: 1000,
     speed: 4.6,
-    power: 1.2,
-    defense: 1.1,
-    jumpForce: 15.2,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 15.0,
     themeColor: '#eab308',
     auraColor: 'rgba(234, 179, 8, 0.4)',
     projectileType: 'boulder',
     specialName: 'Arremesso de Rocha',
     superName: 'Impacto Sísmico Titânico',
-    width: 78,
-    height: 118,
+    width: 68,
+    height: 116,
     colors: {
       fur: '#262626',
       furDark: '#0a0a0a',
@@ -273,17 +272,17 @@ const CHARACTERS = {
     title: 'O Lobo do Cerrado',
     lore: 'Rápido como um raio vermelho, desfere chutes em chamas com pernas longas e ágeis.',
     portrait: 'assets/images/portrait_wolf.jpg',
-    baseHp: 950,
-    speed: 6.0,
-    power: 1.05,
-    defense: 0.95,
-    jumpForce: 15.0,
+    baseHp: 1000,
+    speed: 5.8,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 15.2,
     themeColor: '#f97316',
     auraColor: 'rgba(249, 115, 22, 0.4)',
     projectileType: 'fire_fang',
     specialName: 'Chute Chamejante',
     superName: 'Fúria da Matilha',
-    width: 64,
+    width: 68,
     height: 116,
     colors: {
       fur: '#ea580c',
@@ -311,18 +310,18 @@ const CHARACTERS = {
     title: 'A Sombra Felina',
     lore: 'Mestre da velocidade e furtividade, surge atrás de suas presas antes mesmo do som do golpe ecoar.',
     portrait: 'assets/images/portrait_cat.jpg',
-    baseHp: 880,
-    speed: 6.5,
-    power: 0.9,
-    defense: 0.85,
-    jumpForce: 16.5,
+    baseHp: 1000,
+    speed: 6.2,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 16.0,
     themeColor: '#10b981',
     auraColor: 'rgba(16, 185, 129, 0.4)',
     projectileType: 'kunai_shadow',
     specialName: 'Passo Sombrio',
     superName: 'Dança das Mil Sombras',
-    width: 58,
-    height: 108,
+    width: 68,
+    height: 116,
     colors: {
       fur: '#1f2937',
       furDark: '#030712',
@@ -357,8 +356,8 @@ const CHARACTERS = {
     themeColor: '#ef4444',
     auraColor: 'rgba(239, 68, 68, 0.75)',
     projectileType: 'dragon_fire',
-    specialName: 'Sopro de Lava',
-    superName: 'Cataclismo Meteórico',
+    specialName: 'Chuva de Meteoros',
+    superName: 'Sopro Primordial de Fogo',
     width: 140, // 1.5x maior que personagens padrão (70 -> 140)
     height: 200, // 1.5x maior que personagens padrão (120 -> 200)
     isBoss: true,
@@ -389,18 +388,18 @@ const CHARACTERS = {
     title: 'O Mestre dos Servidores',
     lore: 'O lendário arquiteto de sistemas e senhor dos servidores. Com força titânica e poder do Data Center, desfere socos elétricos, sobrecargas de terminal e comandos SUDO que apagam qualquer oponente!',
     portrait: 'assets/images/portrait_emerson.jpg',
-    baseHp: 1700, // SUPER FORTE!
-    speed: 5.9,
-    power: 1.55, // Dano colossal!
-    defense: 1.40, // Armadura de servidor!
+    baseHp: 1000,
+    speed: 5.5,
+    power: 1.0,
+    defense: 1.0,
     jumpForce: 15.2,
     themeColor: '#06b6d4',
     auraColor: 'rgba(6, 182, 212, 0.65)',
     projectileType: 'cable_kamehameha',
     specialName: 'Kamehameha de Cabos de Rede',
     superName: 'SUDO KILL -9 / PURGE TOTAL',
-    width: 72,
-    height: 122,
+    width: 68,
+    height: 116,
     colors: {
       fur: '#1e293b',
       furDark: '#0f172a',
@@ -424,20 +423,20 @@ const CHARACTERS = {
     id: 'nata',
     name: 'Natã',
     title: 'O Mestre do Frontend & Código',
-    lore: 'O lendário mestre do desenvolvimento e arquitetura web. Seus reflexos compilam golpes na velocidade da luz e seu ki projeta tags semânticas, estilos responsivos e o devastador Hadouken de HTML e CSS!',
+    lore: 'O lendário mestre do desenvolvimento e arquitetura web. Seus reflexos compilam golpes na velocidade da luz e seu ki projeta tags semânticas, estilos responsivos e o Hadouken de HTML e CSS!',
     portrait: 'assets/images/portrait_nata.jpg',
-    baseHp: 1450,
-    speed: 6.2,
-    power: 1.45,
-    defense: 1.25,
-    jumpForce: 15.6,
+    baseHp: 1000,
+    speed: 5.5,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 15.2,
     themeColor: '#f97316',
     auraColor: 'rgba(249, 115, 22, 0.65)',
     projectileType: 'code_tag',
     specialName: 'Syntax Burst',
     superName: 'HADOUKEN HTML & CSS (DISPLAY: FLEX)',
     width: 68,
-    height: 118,
+    height: 116,
     colors: {
       fur: '#ea580c',
       furDark: '#1e293b',
@@ -464,18 +463,18 @@ const CHARACTERS = {
     title: 'O Mestre da Inteligência Artificial',
     lore: 'Visionário supremo e arquiteto de redes neurais quânticas. Mestre dos cálculos futuristas e artes marciais cibernéticas, Andrey canaliza punhos de energia esmeralda pura e comanda robôs de IA autônomos!',
     portrait: 'assets/images/portrait_andrey.jpg',
-    baseHp: 1600,
-    speed: 6.1,
-    power: 1.50,
-    defense: 1.35,
-    jumpForce: 15.4,
+    baseHp: 1000,
+    speed: 5.5,
+    power: 1.0,
+    defense: 1.0,
+    jumpForce: 15.2,
     themeColor: '#10b981',
     auraColor: 'rgba(16, 185, 129, 0.65)',
     projectileType: 'ai_robot',
     specialName: 'Ataque Drones de IA',
     superName: 'SOBRECARGA NEURAL QUANTUM',
-    width: 70,
-    height: 120,
+    width: 68,
+    height: 116,
     colors: {
       fur: '#10b981',
       furDark: '#047857',
@@ -497,14 +496,13 @@ const CHARACTERS = {
   }
 };
 
-// Preload pixel art fighting sprites (14 poses) for EVERY character:
-// idle, idle2, punch, kick, special, crouch, jump, fall, fly, walk1, walk2, back1, back2, knockdown
-const SPRITE_POSES = ['idle', 'idle2', 'punch', 'kick', 'special', 'crouch', 'jump', 'fall', 'fly', 'walk1', 'walk2', 'back1', 'back2', 'knockdown'];
+const SPRITE_POSES = ['idle', 'idle2', 'punch', 'kick', 'special', 'special1', 'special2', 'super', 'crouch', 'jump', 'fall', 'fly', 'fly2', 'walk1', 'walk2', 'back1', 'back2', 'knockdown', 'victory', 'victory1', 'victory2', 'victory3', 'victory4', 'victory5'];
 const fighterSprites = {};
 Object.keys(CHARACTERS).forEach(id => {
   if (!window.SPRITE_META || !window.SPRITE_META[id]) return;
   fighterSprites[id] = {};
-  SPRITE_POSES.forEach(pose => {
+  const actions = Object.keys(window.SPRITE_META[id]);
+  actions.forEach(pose => {
     const img = new Image();
     img.src = `assets/images/sprites/${id}_${pose}.png`;
     fighterSprites[id][pose] = img;
@@ -518,19 +516,139 @@ const FULL_ROSTER = [...PLAYABLE_ROSTER];
 // Choose which sprite pose matches the fighter's current state
 function pickSpritePose(f) {
   const s = f.state;
+  if (s === 'VICTORY') {
+    if (f.charId === 'emerson') {
+      const vt = f.stateTimer || 0;
+      if (vt < 28) return 'victory1';
+      if (vt < 62) return 'victory2';
+      if (vt < 100) return 'victory3';
+      return 'victory4';
+    }
+    if (f.charId === 'andrey') {
+      const vt = f.stateTimer || 0;
+      if (vt < 24) return 'victory1';
+      if (vt < 50) return 'victory2';
+      if (vt < 80) return 'victory3';
+      if (vt < 112) return 'victory4';
+      return 'victory5';
+    }
+    if (f.charId === 'alligator') {
+      return 'victory';
+    }
+    if (f.charId === 'bear') {
+      const vt = f.stateTimer || 0;
+      if (vt < 28) return 'victory1';
+      if (vt < 58) return 'victory2';
+      if (vt < 90) return 'victory3';
+      if (vt < 125) return 'victory4';
+      return 'victory5';
+    }
+    if (f.charId === 'capybara') {
+      const vt = f.stateTimer || 0;
+      if (vt < 30) return 'victory1';
+      if (vt < 65) return 'victory2';
+      if (vt < 100) return 'victory3';
+      if (vt < 135) return 'victory4';
+      return 'victory5';
+    }
+    if (f.charId === 'nata') {
+      const vt = f.stateTimer || 0;
+      if (vt < 28) return 'victory1';
+      if (vt < 60) return 'victory2';
+      if (vt < 95) return 'victory3';
+      if (vt < 130) return 'victory4';
+      return 'victory5';
+    }
+    if (f.charId === 'cat') {
+      const vt = f.stateTimer || 0;
+      if (vt < 28) return 'victory1';
+      if (vt < 58) return 'victory2';
+      if (vt < 88) return 'victory3';
+      if (vt < 125) return 'victory4';
+      return 'victory5';
+    }
+    if (f.charId === 'dog') {
+      const vt = f.stateTimer || 0;
+      if (vt < 28) return 'victory1';
+      if (vt < 58) return 'victory2';
+      if (vt < 88) return 'victory3';
+      if (vt < 125) return 'victory4';
+      return 'victory5';
+    }
+    if (f.charId === 'gorilla') {
+      const vt = f.stateTimer || 0;
+      if (vt < 24) return 'victory1';
+      if (vt < 50) return 'victory2';
+      if (vt < 76) return 'victory3';
+      if (vt < 112) return 'victory4';
+      return 'victory5';
+    }
+    if (f.charId === 'tiger') {
+      const vt = f.stateTimer || 0;
+      if (vt < 24) return 'victory1';
+      if (vt < 52) return 'victory2';
+      if (vt < 82) return 'victory3';
+      if (vt < 118) return 'victory4';
+      return 'victory5';
+    }
+    if (f.charId === 'wolf') {
+      const vt = f.stateTimer || 0;
+      if (vt < 24) return 'victory1';
+      if (vt < 50) return 'victory2';
+      if (vt < 76) return 'victory3';
+      if (vt < 112) return 'victory4';
+      return 'victory5';
+    }
+  }
   if (s === 'KNOCKDOWN' || s === 'DEFEAT') {
+    if (f.charId === 'alligator' || f.charId === 'bear' || f.charId === 'capybara' || f.charId === 'cat' || f.charId === 'gorilla' || f.charId === 'owl' || f.charId === 'tiger' || f.charId === 'wolf') {
+      return f.isGrounded ? 'knockdown' : 'fall';
+    }
     if (f.isGrounded) return 'fall';
     return 'knockdown';
   }
   if (f.isFlying) {
     if (s === 'ATTACK_LIGHT') return 'punch';
     if (s === 'ATTACK_HEAVY') return 'kick';
-    if (s === 'SPECIAL' || s === 'SUPER') return 'special';
-    return 'fly';
+    if (f.charId === 'dragon') {
+      if (s === 'SUPER') return 'special'; // Super é o sprite de fogo
+      if (s === 'SPECIAL') return 'fly';
+    } else {
+      if (s === 'SPECIAL' || s === 'SUPER') return 'special';
+    }
+    // Bater asas com dois sprites (alternando asas para cima / asas para baixo)
+    return (Math.floor(f.animTimer / 8) % 2 === 0) ? 'fly' : 'fly2';
   }
   if (s === 'CROUCH') return 'crouch';
-  if (s === 'JUMP') return 'jump';
-  if (s === 'SPECIAL' || s === 'SUPER') return 'special';
+  if (s === 'JUMP') {
+    if (f.charId === 'dragon') {
+      return (Math.floor(f.animTimer / 8) % 2 === 0) ? 'fly' : 'fly2';
+    }
+    return 'jump';
+  }
+  if (f.charId === 'dragon') {
+    if (s === 'SUPER') return 'special'; // Super é aquele sprite de fogo!
+    if (s === 'SPECIAL') return 'punch'; // Especial invoca a chuva de meteoros!
+  } else if (f.charId === 'bear') {
+    if (s === 'SUPER') return 'super'; // Super é a onda de gelo colossal!
+    if (s === 'SPECIAL') return 'special'; // Especial é o soco de impacto congelante!
+  } else if (f.charId === 'capybara') {
+    if (s === 'SPECIAL') {
+      // Especial com dois sprites alternando durante o voo do chute pra frente!
+      return (Math.floor(f.animTimer / 5) % 2 === 0) ? 'special1' : 'special2';
+    }
+    if (s === 'SUPER') {
+      return 'special2'; // Poder que sai do chute
+    }
+  } else if (f.charId === 'cat') {
+    if (s === 'SUPER') return 'super'; // Super de Garra em X!
+    if (s === 'SPECIAL') return 'special'; // Especial de Garras!
+  } else if (f.charId === 'owl') {
+    if (s === 'SUPER') return 'super'; // Super com penas afiadas voando!
+    if (s === 'SPECIAL') return 'special'; // Especial com tornado!
+  } else {
+    if (s === 'SPECIAL' || s === 'SUPER') return 'special';
+  }
   if (s === 'ATTACK_HEAVY') {
     if (f.isCrouchAttacking) return 'crouch';
     if (f.isAirAttacking || !f.isGrounded) return 'kick';
@@ -541,7 +659,15 @@ function pickSpritePose(f) {
     if (f.isAirAttacking || !f.isGrounded) return 'jump';
     return (f.attackPhase === 'startup' && f.stateTimer < 3) ? 'idle' : 'punch';
   }
-  if (!f.isGrounded) return 'jump';
+  if (!f.isGrounded) {
+    if (f.charId === 'dragon') {
+      return (Math.floor(f.animTimer / 8) % 2 === 0) ? 'fly' : 'fly2';
+    }
+    if ((f.charId === 'alligator' || f.charId === 'bear' || f.charId === 'capybara' || f.charId === 'cat' || f.charId === 'gorilla' || f.charId === 'owl' || f.charId === 'tiger' || f.charId === 'wolf') && s === 'HIT') {
+      return 'fall';
+    }
+    return 'jump';
+  }
   if (s === 'WALK' || (Math.abs(f.vx) > 0.35 && f.isGrounded)) {
     const dir = f.vx * f.facing;
     const step = (Math.floor(f.animTimer / 6) % 2 === 0);
@@ -620,8 +746,9 @@ function drawFighterSprite(ctx, fighter) {
   ctx.translate(fighter.x, fighter.y);
   if (!isFacingRight) ctx.scale(-1, 1);
 
-  // --- Shadow on the floor (shrinks while airborne) ---
-  const shadowScale = Math.max(0.35, 1 - airHeight / 260);
+  // --- Shadow on the floor (shrinks while airborne or levitating) ---
+  const isCapyLotus = (state === 'VICTORY' && fighter.charId === 'capybara' && pose === 'victory5');
+  const shadowScale = isCapyLotus ? 0.7 + Math.sin(t * 0.08) * 0.04 : Math.max(0.35, 1 - airHeight / 260);
   ctx.fillStyle = `rgba(0, 0, 0, ${0.45 * shadowScale})`;
   ctx.beginPath();
   ctx.ellipse(0, airHeight, char.width * 0.75 * shadowScale, 12 * shadowScale, 0, 0, Math.PI * 2);
@@ -639,9 +766,52 @@ function drawFighterSprite(ctx, fighter) {
     rot = Math.sin(t * 0.08) * 0.03 + Math.max(-0.25, Math.min(0.25, fighter.vx * 0.04));
     sy = 1 + Math.sin(t * 0.22) * 0.025;
   } else if (state === 'IDLE' || state === 'VICTORY') {
-    sy = 1 + Math.sin(t * 0.12) * 0.018; // breathing
-    sx = 1 - Math.sin(t * 0.12) * 0.008;
-    if (state === 'VICTORY') offY = -Math.abs(Math.sin(t * 0.15)) * 14;
+    if (state === 'VICTORY' && (fighter.charId === 'emerson' || fighter.charId === 'andrey' || fighter.charId === 'alligator' || fighter.charId === 'bear' || fighter.charId === 'capybara' || fighter.charId === 'nata' || fighter.charId === 'cat' || fighter.charId === 'dog' || fighter.charId === 'gorilla' || fighter.charId === 'tiger' || fighter.charId === 'wolf')) {
+      offY = 0;
+      sy = 1;
+      sx = 1;
+      if (pose === 'victory4' && fighter.charId === 'emerson') {
+        offX = (Math.random() - 0.5) * 2; // subtle electric aura vibration
+      } else if (pose === 'victory5' && fighter.charId === 'andrey') {
+        offX = (Math.random() - 0.5) * 2; // cybernetic core vibration
+      } else if (pose === 'victory' && fighter.charId === 'alligator') {
+        offX = (Math.random() - 0.5) * 2.5; // primal swamp roar vibration
+      } else if (pose === 'victory5' && fighter.charId === 'bear') {
+        offX = (Math.random() - 0.5) * 2.5; // mountain berserker roar vibration
+      } else if (pose === 'victory5' && fighter.charId === 'capybara') {
+        // Floating/levitating in serene lotus meditation pose!
+        offY = -45 + Math.sin(t * 0.08) * 8;
+        sy = 1 + Math.sin(t * 0.08) * 0.02;
+        sx = 1 - Math.sin(t * 0.08) * 0.01;
+      } else if (pose === 'victory5' && fighter.charId === 'nata') {
+        // Rockstar stage shredding bounce & headbang vibration!
+        offX = (Math.random() - 0.5) * 2.5;
+        offY = Math.sin(t * 0.22) * 3;
+      } else if (fighter.charId === 'cat') {
+        if (pose === 'victory4' || pose === 'victory5') {
+          offX = Math.sin(t * 0.25) * 1.0; // gentle rhythmic licking/grooming motion
+        }
+      } else if (fighter.charId === 'dog') {
+        if (pose === 'victory5') {
+          offY = Math.sin(t * 0.18) * 3.5; // triumphant graduation fist pump bounce
+        }
+      } else if (fighter.charId === 'gorilla') {
+        if (pose === 'victory2' || pose === 'victory3' || pose === 'victory4') {
+          offX = (Math.random() - 0.5) * 2.5; // chest beat thump vibration
+        } else if (pose === 'victory5') {
+          offX = (Math.random() - 0.5) * 3.5; // King Kong roar vibration
+          offY = Math.sin(t * 0.22) * 2.5;
+        }
+      } else if (fighter.charId === 'wolf') {
+        if (pose === 'victory4' || pose === 'victory5') {
+          offX = (Math.random() - 0.5) * 2.5; // blazing fire aura vibration
+        }
+      }
+    } else {
+      sy = 1 + Math.sin(t * 0.12) * 0.018; // breathing
+      sx = 1 - Math.sin(t * 0.12) * 0.008;
+      if (state === 'VICTORY') offY = -Math.abs(Math.sin(t * 0.15)) * 14;
+    }
   } else if (state === 'WALK') {
     offY = -Math.abs(Math.sin(t * 0.25)) * 5;
     rot = Math.sin(t * 0.25) * 0.04 + 0.03 * Math.sign(fighter.vx * fighter.facing);
@@ -661,7 +831,12 @@ function drawFighterSprite(ctx, fighter) {
     rot = -0.2;
   } else if (state === 'KNOCKDOWN' || state === 'DEFEAT') {
     const onFloor = fighter.isGrounded;
-    if (pose === 'fall') {
+    if (fighter.charId === 'alligator' || fighter.charId === 'bear' || fighter.charId === 'capybara' || fighter.charId === 'cat' || fighter.charId === 'gorilla' || fighter.charId === 'owl' || fighter.charId === 'tiger' || fighter.charId === 'wolf') {
+      // Both fall (airborne) and knockdown (floor) are pre-drawn in exact orientation
+      rot = 0;
+      offX = 0;
+      offY = 0;
+    } else if (pose === 'fall') {
       // The fall sprite is already pre-rendered flat on the floor
       rot = 0;
       offX = 0;
@@ -682,6 +857,9 @@ function drawFighterSprite(ctx, fighter) {
     } else if (fighter.isAirAttacking || !fighter.isGrounded) {
       rot = fighter.attackPhase === 'active' ? 0.38 : 0.15; // diving strike
       offX = fighter.attackPhase === 'active' ? 10 : 0;
+    } else if (state === 'SPECIAL' || state === 'SUPER') {
+      rot = 0;
+      offX = (fighter.charId === 'alligator' || fighter.charId === 'bear' || fighter.charId === 'capybara' || fighter.charId === 'cat') ? 0 : 12;
     } else if (fighter.attackPhase === 'active') {
       offX = state === 'ATTACK_LIGHT' ? 6 : 14;
       rot = state === 'ATTACK_LIGHT' ? 0.02 : 0.05;
@@ -745,9 +923,9 @@ function drawFighterSprite(ctx, fighter) {
     } else if (pose === 'kick') {
       fx = fw - ax + 10;
       fy = -fh * 0.58; // powerful kick impact zone
-    } else if (pose === 'special') {
+    } else if (pose === 'special' || pose === 'super') {
       fx = fw - ax + 14;
-      fy = -fh * 0.65; // special blast impact zone
+      fy = -fh * 0.55; // special/super claw slash impact zone
     } else {
       fx = fw - ax - 4;
       fy = -fh * 0.68; // fist at end of extended arm

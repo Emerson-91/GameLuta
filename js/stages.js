@@ -1,4 +1,4 @@
-// Stages and Parallax Engine for Animal Kombat
+// Stages and Parallax Engine for Super Fighters Combat
 
 const STAGES = {
   street: {

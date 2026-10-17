@@ -1,4 +1,4 @@
-// Fighter Combat Engine for Animal Kombat
+// Fighter Combat Engine for Super Fighters Combat
 
 class Fighter {
   constructor(charId, isP2 = false, isCpu = false) {
@@ -253,7 +253,7 @@ class Fighter {
         hitStun: 14
       };
     } else if (this.state === 'ATTACK_HEAVY') {
-      const w = 90;
+      const w = this.charId === 'gorilla' ? 120 : (this.charId === 'owl' ? 110 : 90);
       const h = 65;
       box = {
         x: dir === 1 ? this.x + 12 : this.x - (w + 12),
@@ -266,20 +266,20 @@ class Fighter {
         hitStun: 22
       };
     } else if (this.state === 'SPECIAL') {
-      const w = this.charId === 'dog' ? 260 : 100;
-      const h = 75;
+      const w = this.charId === 'dog' ? 260 : (this.charId === 'gorilla' ? 210 : (this.charId === 'owl' ? 180 : (this.charId === 'capybara' ? 140 : (this.charId === 'cat' ? 160 : 100))));
+      const h = this.charId === 'gorilla' ? 110 : (this.charId === 'owl' ? 95 : (this.charId === 'capybara' ? 95 : (this.charId === 'cat' ? 85 : 75)));
       box = {
         x: dir === 1 ? this.x + 10 : this.x - (w + 10),
-        y: this.y - this.height * 0.80,
+        y: this.y - this.height * 0.85,
         width: w,
         height: h,
         damage: 120 * this.power,
         isHeavy: true,
-        knockback: 14 * dir,
-        hitStun: 28
+        knockback: 16 * dir,
+        hitStun: 30
       };
     } else if (this.state === 'SUPER') {
-      const w = 140;
+      const w = this.charId === 'cat' ? 180 : 140;
       box = {
         x: dir === 1 ? this.x : this.x - (w + 10),
         y: this.y - this.height * 0.95,
@@ -477,7 +477,7 @@ class Fighter {
 
     // If Andrey, deploy 2 autonomous AI Combat Bots from the sky shooting down for 3 seconds!
     if (this.charId === 'andrey') {
-      window.particleSystem.addText(this.x, this.y - this.height - 25, "DRONES IA ATIVADOS!", "#f97316", 24);
+      window.particleSystem.addText(this.x, this.y - this.height - 25, "DUPLA DE DRONES IA!", "#f97316", 24);
       setTimeout(() => {
         if (!this.isDead && (this.state === 'SPECIAL' || this.stateTimer < 35)) {
           window.soundEngine.playSpecial();
@@ -495,6 +495,104 @@ class Fighter {
         if (!this.isDead && (this.state === 'SPECIAL' || this.stateTimer < 35)) {
           window.soundEngine.playSpecial();
           window.particleSystem.spawnProjectile(this, 'bone_blast');
+        }
+      }, 35);
+      return;
+    }
+
+    // If Dragon Vulcanus, unleash meteor shower raining from the sky for 3 seconds!
+    if (this.charId === 'dragon') {
+      window.particleSystem.addText(this.x, this.y - this.height - 25, "CHUVA DE METEOROS!", "#ea580c", 26);
+      window.particleSystem.shake(14);
+      window.particleSystem.spawnDragonMeteorShower(this, 180);
+      return;
+    }
+
+    // If Capybara Mestre Kai, flying dragon kick surging forward across the screen!
+    if (this.charId === 'capybara') {
+      window.particleSystem.addText(this.x, this.y - this.height - 25, "CHUTE DO DRAGÃO CHI!", "#f59e0b", 26);
+      window.soundEngine.playSpecial();
+      window.particleSystem.shake(12);
+      this.vx = this.facing * 16.5;
+      this.vy = -3;
+      this.isGrounded = false;
+      this.attackPhase = 'active';
+      return;
+    }
+
+    // If Cat Kage, shadow claw triple slash wave!
+    if (this.charId === 'cat') {
+      window.soundEngine.playSpecial();
+      window.particleSystem.shake(10);
+      window.particleSystem.addText(this.x, this.y - this.height - 25, "GARRAS DA SOMBRA!", "#10b981", 24);
+      window.particleSystem.createSlashTrail(this.x + this.facing * 35, this.y - this.height * 0.5, this.facing, '#10b981', 40);
+      for (let i = 0; i < 16; i++) {
+        window.particleSystem.particles.push({
+          x: this.x + this.facing * (20 + Math.random() * 40),
+          y: this.y - this.height * 0.55 + (Math.random() - 0.5) * 30,
+          vx: this.facing * (4 + Math.random() * 5),
+          vy: (Math.random() - 0.5) * 4,
+          color: Math.random() > 0.5 ? '#10b981' : '#34d399',
+          life: 18,
+          maxLife: 18,
+          size: 3.5,
+          type: 'spark'
+        });
+      }
+      return;
+    }
+
+    // If Gorilla Kongo, explosive seismic titan punch with earth blast & rock burst!
+    if (this.charId === 'gorilla') {
+      window.particleSystem.addText(this.x, this.y - this.height - 25, "IMPACTO SÍSMICO TITÂNICO!", "#eab308", 26);
+      window.particleSystem.shake(14);
+      window.soundEngine.playHitHeavy();
+      window.soundEngine.playSpecial();
+      this.vx = this.facing * 5.0; // powerful lunging punch forward
+      window.particleSystem.createImpactRing(this.x + this.facing * 60, this.y, '#f59e0b', true);
+      for (let i = 0; i < 24; i++) {
+        window.particleSystem.particles.push({
+          x: this.x + this.facing * (40 + Math.random() * 55),
+          y: this.y - 10 - Math.random() * 50,
+          vx: this.facing * (3 + Math.random() * 6),
+          vy: -3 - Math.random() * 5,
+          color: Math.random() > 0.4 ? '#f59e0b' : (Math.random() > 0.5 ? '#ea580c' : '#78350f'),
+          life: 25,
+          maxLife: 25,
+          size: 4 + Math.random() * 3,
+          type: 'spark'
+        });
+      }
+      setTimeout(() => {
+        if (!this.isDead && (this.state === 'SPECIAL' || this.stateTimer < 35)) {
+          window.particleSystem.spawnProjectile(this, 'boulder');
+        }
+      }, 40);
+      return;
+    }
+
+    // If Owl Nocturna, summon swirling shinobi vortex tornado!
+    if (this.charId === 'owl') {
+      window.particleSystem.addText(this.x, this.y - this.height - 25, "TORNADO SHINOBI!", "#8b5cf6", 24);
+      window.particleSystem.shake(12);
+      window.soundEngine.playSpecial();
+      for (let i = 0; i < 16; i++) {
+        window.particleSystem.particles.push({
+          x: this.x + this.facing * (30 + Math.random() * 40),
+          y: this.y - this.height * 0.5 + (Math.random() - 0.5) * 40,
+          vx: this.facing * (3 + Math.random() * 4),
+          vy: -2 - Math.random() * 3,
+          color: Math.random() > 0.5 ? '#8b5cf6' : '#c4b5fd',
+          life: 20,
+          maxLife: 20,
+          size: 3.5,
+          type: 'spark'
+        });
+      }
+      setTimeout(() => {
+        if (!this.isDead && (this.state === 'SPECIAL' || this.stateTimer < 35)) {
+          window.soundEngine.playProjectile();
+          window.particleSystem.spawnProjectile(this, 'tornado');
         }
       }, 35);
       return;
@@ -529,13 +627,35 @@ class Fighter {
     window.particleSystem.shake(16);
     window.particleSystem.addText(this.x, this.y - this.height - 30, this.charData.superName.toUpperCase(), this.themeColor, 32);
 
-    // If Dragon Boss, launch meteor shower
+    // If Dragon Vulcanus, unleash the devastating Magma Fire Torrent Super!
     if (this.charId === 'dragon') {
-      for (let i = 0; i < 4; i++) {
-        setTimeout(() => {
-          window.particleSystem.spawnProjectile(this, 'meteor');
-        }, i * 220);
-      }
+      setTimeout(() => {
+        if (!this.isDead) {
+          window.particleSystem.spawnDragonSuperFlame(this);
+        }
+      }, 100);
+    }
+
+    // If Bear Ursus, unleash Terremoto Glacial seismic frost blast!
+    if (this.charId === 'bear') {
+      setTimeout(() => {
+        if (!this.isDead && window.particleSystem) {
+          window.particleSystem.shake(18);
+          for (let i = 0; i < 35; i++) {
+            window.particleSystem.particles.push({
+              x: this.x + this.facing * (40 + Math.random() * 120),
+              y: this.y - Math.random() * 90,
+              vx: this.facing * (5 + Math.random() * 8),
+              vy: -2 - Math.random() * 5,
+              color: Math.random() > 0.4 ? '#38bdf8' : (Math.random() > 0.5 ? '#ffffff' : '#0284c7'),
+              life: 25,
+              maxLife: 25,
+              size: 5,
+              type: 'spark'
+            });
+          }
+        }
+      }, 80);
     }
 
     // If Natã, launch HTML/CSS Hadouken Super!
@@ -546,6 +666,41 @@ class Fighter {
           window.particleSystem.spawnProjectile(this, 'code_hadouken');
         }
       }, 160);
+    }
+
+    // If Capybara Mestre Kai, unleash blazing Chi crescent wave from the kick!
+    if (this.charId === 'capybara') {
+      setTimeout(() => {
+        if (!this.isDead) {
+          window.soundEngine.playProjectile();
+          window.particleSystem.shake(16);
+          window.particleSystem.spawnProjectile(this, 'fire_kick_crescent');
+        }
+      }, 70);
+    }
+
+    // If Cat Kage, crossed arms glowing X claw slash cataclysm!
+    if (this.charId === 'cat') {
+      setTimeout(() => {
+        if (!this.isDead && window.particleSystem) {
+          window.particleSystem.shake(20);
+          window.particleSystem.addText(this.x, this.y - this.height - 35, "★ CORTE X DAS SOMBRAS! ★", "#10b981", 28);
+          window.particleSystem.createSlashTrail(this.x + this.facing * 45, this.y - this.height * 0.5, this.facing, '#10b981', 60);
+          for (let i = 0; i < 35; i++) {
+            window.particleSystem.particles.push({
+              x: this.x + this.facing * (30 + Math.random() * 80),
+              y: this.y - Math.random() * 110,
+              vx: this.facing * (6 + Math.random() * 8),
+              vy: (Math.random() - 0.5) * 8,
+              color: Math.random() > 0.4 ? '#10b981' : (Math.random() > 0.5 ? '#34d399' : '#a7f3d0'),
+              life: 25,
+              maxLife: 25,
+              size: 5,
+              type: 'spark'
+            });
+          }
+        }
+      }, 70);
     }
 
     // If Andrey, deploy supreme squad of AI Combat Bots from the sky!
@@ -568,6 +723,24 @@ class Fighter {
             window.particleSystem.spawnCableKamehameha(this, i, true);
           }
         }, 80 + i * 55);
+      }
+    }
+
+    // If Owl Nocturna, unleash razor feather storm barrage!
+    if (this.charId === 'owl') {
+      window.particleSystem.shake(20);
+      window.particleSystem.addText(this.x, this.y - this.height - 35, "★ TEMPESTADE DE PENAS SHINOBI! ★", "#8b5cf6", 26);
+      for (let i = 0; i < 14; i++) {
+        setTimeout(() => {
+          if (!this.isDead) {
+            window.soundEngine.playHitLight();
+            const p = window.particleSystem.spawnProjectile(this, 'feather_blade');
+            if (p) {
+              p.vy = (Math.random() - 0.5) * 3.5;
+              p.damage = 22 * this.power;
+            }
+          }
+        }, 40 + i * 45);
       }
     }
   }
@@ -826,16 +999,43 @@ class Fighter {
         this.attackPhase = '';
       }
     } else if (this.state === 'SPECIAL') {
-      if (this.stateTimer <= 5) {
-        this.attackPhase = 'startup';
-      } else if (this.stateTimer <= 16) {
-        this.attackPhase = 'active';
-        this.vx = 5.5 * this.facing; // dash forward faster during special
-      } else if (this.stateTimer <= 25) {
-        this.attackPhase = 'recovery';
+      if (this.charId === 'capybara') {
+        // Capybara's Flying Dragon Kick sweeps forward across the screen with two sprites!
+        if (this.stateTimer <= 38) {
+          this.attackPhase = 'active';
+          this.vx = 15.5 * this.facing;
+          if (this.animTimer % 2 === 0 && window.particleSystem) {
+            window.particleSystem.particles.push({
+              x: this.x - this.facing * 25 + (Math.random() - 0.5) * 15,
+              y: this.y - 35 + (Math.random() - 0.5) * 20,
+              vx: -this.facing * (2 + Math.random() * 3),
+              vy: (Math.random() - 0.5) * 2,
+              color: Math.random() > 0.4 ? '#f59e0b' : '#ef4444',
+              life: 15,
+              maxLife: 15,
+              size: 4,
+              type: 'spark'
+            });
+          }
+        } else if (this.stateTimer <= 46) {
+          this.attackPhase = 'recovery';
+          this.vx *= 0.82;
+        } else {
+          this.state = this.isGrounded ? 'IDLE' : 'JUMP';
+          this.attackPhase = '';
+        }
       } else {
-        this.state = 'IDLE';
-        this.attackPhase = '';
+        if (this.stateTimer <= 5) {
+          this.attackPhase = 'startup';
+        } else if (this.stateTimer <= 16) {
+          this.attackPhase = 'active';
+          this.vx = 5.5 * this.facing; // dash forward faster during special
+        } else if (this.stateTimer <= 25) {
+          this.attackPhase = 'recovery';
+        } else {
+          this.state = 'IDLE';
+          this.attackPhase = '';
+        }
       }
     } else if (this.state === 'SUPER') {
       if (this.stateTimer <= 16) {
@@ -860,6 +1060,615 @@ class Fighter {
           this.isFlying = true;
           this.flightAltitude = 85;
           this.vy = -5;
+        }
+      }
+    } else if (this.state === 'VICTORY') {
+      this.vx = 0;
+      if (this.charId === 'emerson') {
+        if (this.stateTimer === 62) {
+          // Surge of blue electric aura
+          if (window.particleSystem) {
+            window.particleSystem.shake(8);
+            for (let i = 0; i < 14; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 55,
+                y: this.y - Math.random() * 85,
+                vx: (Math.random() - 0.5) * 3,
+                vy: -2 - Math.random() * 4,
+                color: Math.random() > 0.5 ? '#38bdf8' : '#22d3ee',
+                life: 20,
+                maxLife: 20,
+                size: 4,
+                type: 'spark'
+              });
+            }
+          }
+          if (window.soundEngine) window.soundEngine.playSpecial();
+        } else if (this.stateTimer === 100) {
+          // Full power Akuma / Super Saiyan aura burst!
+          if (window.particleSystem) {
+            window.particleSystem.shake(16);
+            window.particleSystem.addText(this.x, this.y - this.height - 30, "★ PURGE SUPREMO! ★", "#22d3ee", 26);
+            for (let i = 0; i < 26; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 75,
+                y: this.y - Math.random() * 130,
+                vx: (Math.random() - 0.5) * 5,
+                vy: -4 - Math.random() * 6,
+                color: Math.random() > 0.4 ? '#38bdf8' : '#ffffff',
+                life: 25,
+                maxLife: 25,
+                size: 5,
+                type: 'spark'
+              });
+            }
+          }
+          if (window.soundEngine) window.soundEngine.playSuperActivate();
+        }
+
+        // Continuous subtle aura particles while in pose 3 or 4
+        if (this.stateTimer > 62 && this.animTimer % 4 === 0 && window.particleSystem) {
+          window.particleSystem.particles.push({
+            x: this.x + (Math.random() - 0.5) * 60,
+            y: this.y - Math.random() * 60,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -3 - Math.random() * 3,
+            color: Math.random() > 0.3 ? '#38bdf8' : '#e0f2fe',
+            life: 18,
+            maxLife: 18,
+            size: 3.5,
+            type: 'spark'
+          });
+        }
+      } else if (this.charId === 'andrey') {
+        // Andrey 5-stage Terminator Transformation Sequence
+        if (this.stateTimer === 24) {
+          // Cybernetic Ocular Unit online
+          if (window.particleSystem) {
+            window.particleSystem.createHitspark(this.x + 12 * this.facing, this.y - this.height * 0.85, false, '#ef4444');
+          }
+          if (window.soundEngine) window.soundEngine.playHitLight();
+        } else if (this.stateTimer === 50) {
+          // Cyber arm & metal core revealed
+          if (window.particleSystem) {
+            window.particleSystem.createHitspark(this.x, this.y - this.height * 0.55, true, '#10b981');
+          }
+          if (window.soundEngine) window.soundEngine.playSpecial();
+        } else if (this.stateTimer === 80) {
+          // Electrical discharge from endoskeleton
+          if (window.particleSystem) {
+            window.particleSystem.shake(8);
+            for (let i = 0; i < 14; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 50,
+                y: this.y - Math.random() * 80,
+                vx: (Math.random() - 0.5) * 4,
+                vy: -2 - Math.random() * 4,
+                color: Math.random() > 0.4 ? '#38bdf8' : '#fbbf24',
+                life: 20,
+                maxLife: 20,
+                size: 3.5,
+                type: 'spark'
+              });
+            }
+          }
+          if (window.soundEngine) window.soundEngine.playHitHeavy();
+        } else if (this.stateTimer === 112) {
+          // Full Terminator God transformation
+          if (window.particleSystem) {
+            window.particleSystem.shake(16);
+            window.particleSystem.addText(this.x, this.y - this.height - 30, "★ SISTEMA IA: ANIKILAÇÃO TOTAL! ★", "#10b981", 24);
+            for (let i = 0; i < 28; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 70,
+                y: this.y - Math.random() * 120,
+                vx: (Math.random() - 0.5) * 6,
+                vy: -3 - Math.random() * 6,
+                color: Math.random() > 0.5 ? '#10b981' : '#f97316',
+                life: 25,
+                maxLife: 25,
+                size: 4.5,
+                type: 'spark'
+              });
+            }
+          }
+          if (window.soundEngine) window.soundEngine.playSuperActivate();
+        }
+
+        // Sparks & heat while in cyborg form (poses 4 and 5)
+        if (this.stateTimer > 80 && this.animTimer % 4 === 0 && window.particleSystem) {
+          window.particleSystem.particles.push({
+            x: this.x + (Math.random() - 0.5) * 55,
+            y: this.y - Math.random() * 70,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -2 - Math.random() * 3,
+            color: Math.random() > 0.5 ? '#f97316' : '#38bdf8',
+            life: 16,
+            maxLife: 16,
+            size: 3,
+            type: 'spark'
+          });
+        }
+      } else if (this.charId === 'alligator') {
+        // Brutus Swamp King Victory Roar & Emerald Aura Burst
+        if (this.stateTimer === 1) {
+          if (window.particleSystem) {
+            window.particleSystem.shake(16);
+            window.particleSystem.addText(this.x, this.y - this.height - 30, "★ FÚRIA DO PÂNTANO! ★", "#22c55e", 26);
+            for (let i = 0; i < 30; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 80,
+                y: this.y - Math.random() * 120,
+                vx: (Math.random() - 0.5) * 5,
+                vy: -3 - Math.random() * 6,
+                color: Math.random() > 0.4 ? '#22c55e' : (Math.random() > 0.5 ? '#84cc16' : '#15803d'),
+                life: 25,
+                maxLife: 25,
+                size: 5,
+                type: 'spark'
+              });
+            }
+          }
+          if (window.soundEngine) window.soundEngine.playSuperActivate();
+        }
+
+        // Continuous green fire aura while celebrating victory
+        if (this.animTimer % 3 === 0 && window.particleSystem) {
+          window.particleSystem.particles.push({
+            x: this.x + (Math.random() - 0.5) * 70,
+            y: this.y - 10 - Math.random() * 100,
+            vx: (Math.random() - 0.5) * 3,
+            vy: -3 - Math.random() * 4,
+            color: Math.random() > 0.3 ? '#22c55e' : '#a3e635',
+            life: 20,
+            maxLife: 20,
+            size: 4,
+            type: 'spark'
+          });
+        }
+      } else if (this.charId === 'bear') {
+        // Bear Ursus Lumberjack Log Break & Mountain Berserker Roar
+        if (this.stateTimer === 58) {
+          // Moment the log is struck and begins to crack
+          if (window.soundEngine) window.soundEngine.playHitHeavy();
+          if (window.particleSystem) {
+            window.particleSystem.shake(8);
+            for (let i = 0; i < 14; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + this.facing * 35 + (Math.random() - 0.5) * 40,
+                y: this.y - this.height * 0.45 + (Math.random() - 0.5) * 30,
+                vx: (Math.random() - 0.5) * 5,
+                vy: -2 - Math.random() * 4,
+                color: Math.random() > 0.5 ? '#78350f' : '#38bdf8',
+                life: 20,
+                maxLife: 20,
+                size: 3.5,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 90) {
+          // Log snaps completely in two! Explosive splinter burst!
+          if (window.soundEngine) window.soundEngine.playSpecial();
+          if (window.particleSystem) {
+            window.particleSystem.shake(14);
+            for (let i = 0; i < 24; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 70,
+                y: this.y - this.height * 0.45 + (Math.random() - 0.5) * 40,
+                vx: (Math.random() - 0.5) * 7,
+                vy: -3 - Math.random() * 5,
+                color: Math.random() > 0.4 ? '#92400e' : (Math.random() > 0.5 ? '#b45309' : '#38bdf8'),
+                life: 25,
+                maxLife: 25,
+                size: 4.5,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 125) {
+          // Double bicep roar of triumph with frost aura!
+          if (window.soundEngine) window.soundEngine.playSuperActivate();
+          if (window.particleSystem) {
+            window.particleSystem.shake(16);
+            window.particleSystem.addText(this.x, this.y - this.height - 30, "★ FORÇA DA MONTANHA! ★", "#38bdf8", 26);
+            for (let i = 0; i < 30; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 75,
+                y: this.y - Math.random() * 110,
+                vx: (Math.random() - 0.5) * 5,
+                vy: -3 - Math.random() * 6,
+                color: Math.random() > 0.4 ? '#38bdf8' : (Math.random() > 0.5 ? '#ffffff' : '#0284c7'),
+                life: 25,
+                maxLife: 25,
+                size: 4.5,
+                type: 'spark'
+              });
+            }
+          }
+        }
+
+        // Frost crystals from headband/eyes while in final victory pose
+        if (this.stateTimer > 125 && this.animTimer % 4 === 0 && window.particleSystem) {
+          window.particleSystem.particles.push({
+            x: this.x + (Math.random() - 0.5) * 45,
+            y: this.y - this.height * 0.75 - Math.random() * 25,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -2 - Math.random() * 3,
+            color: Math.random() > 0.4 ? '#38bdf8' : '#e0f2fe',
+            life: 18,
+            maxLife: 18,
+            size: 3.5,
+            type: 'spark'
+          });
+        }
+      } else if (this.charId === 'capybara') {
+        // Mestre Kai Zen Enlightenment Sequence
+        if (this.stateTimer === 65) {
+          // Putting on Orange Kimono / Centering Ki
+          if (window.soundEngine) window.soundEngine.playHitLight();
+        } else if (this.stateTimer === 100) {
+          // Gassho Reverence Bow - Pure Chi Focus
+          if (window.soundEngine) window.soundEngine.playSpecial();
+          if (window.particleSystem) {
+            window.particleSystem.shake(6);
+            for (let i = 0; i < 16; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 45,
+                y: this.y - this.height * 0.55 + (Math.random() - 0.5) * 30,
+                vx: (Math.random() - 0.5) * 4,
+                vy: -2 - Math.random() * 3,
+                color: Math.random() > 0.5 ? '#f59e0b' : '#fbbf24',
+                life: 20,
+                maxLife: 20,
+                size: 3.5,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 135) {
+          // Ascension to Lotus Float with Golden Halo Awakening!
+          if (window.soundEngine) window.soundEngine.playSuperActivate();
+          if (window.particleSystem) {
+            window.particleSystem.shake(12);
+            window.particleSystem.addText(this.x, this.y - this.height - 40, "★ ILUMINAÇÃO ZEN SUPREMA! ★", "#f59e0b", 26);
+            for (let i = 0; i < 30; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 80,
+                y: this.y - Math.random() * 110,
+                vx: (Math.random() - 0.5) * 5,
+                vy: -3 - Math.random() * 5,
+                color: Math.random() > 0.4 ? '#f59e0b' : (Math.random() > 0.5 ? '#fbbf24' : '#fef08a'),
+                life: 25,
+                maxLife: 25,
+                size: 4.5,
+                type: 'spark'
+              });
+            }
+          }
+        }
+
+        // Golden Chi sparkles levitating upward around floating lotus (pose 5)
+        if (this.stateTimer > 135 && this.animTimer % 3 === 0 && window.particleSystem) {
+          window.particleSystem.particles.push({
+            x: this.x + (Math.random() - 0.5) * 65,
+            y: this.y - 15 - Math.random() * 85,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: -2 - Math.random() * 2.5,
+            color: Math.random() > 0.4 ? '#fbbf24' : (Math.random() > 0.5 ? '#fef08a' : '#f59e0b'),
+            life: 22,
+            maxLife: 22,
+            size: 3.5,
+            type: 'spark'
+          });
+        }
+      } else if (this.charId === 'nata') {
+        // Nata Rockstar Electric Guitar Victory Sequence
+        // Guitar sounds are played EXCLUSIVELY during Nata's victory when he wins the round!
+        if (this.stateTimer === 1) {
+          // Strap on & amp plug-in click
+          if (window.soundEngine) window.soundEngine.playNataGuitarVictory('prep');
+        } else if (this.stateTimer === 60) {
+          // Power chord hit
+          if (window.soundEngine) window.soundEngine.playNataGuitarVictory('chord');
+        } else if (this.stateTimer === 95) {
+          // Strumming power chord riff (D5 -> E5 -> G5)
+          if (window.soundEngine) window.soundEngine.playNataGuitarVictory('strum');
+        } else if (this.stateTimer === 130) {
+          // Epic Rockstar Guitar Solo Lick with Screaming Bends & Vibrato!
+          if (window.soundEngine) window.soundEngine.playNataGuitarVictory('solo');
+          if (window.particleSystem) {
+            window.particleSystem.shake(14);
+            window.particleSystem.addText(this.x, this.y - this.height - 40, "★ ROCKSTAR SHREDDING SOLO! ★", "#f43f5e", 26);
+            for (let i = 0; i < 30; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 80,
+                y: this.y - Math.random() * 110,
+                vx: (Math.random() - 0.5) * 6,
+                vy: -3 - Math.random() * 5,
+                color: Math.random() > 0.4 ? '#f43f5e' : (Math.random() > 0.5 ? '#f59e0b' : '#38bdf8'),
+                life: 25,
+                maxLife: 25,
+                size: 4.5,
+                type: 'spark'
+              });
+            }
+          }
+        }
+
+        // Floating musical notes while strumming (poses 4 and 5)
+        if (this.stateTimer >= 95 && this.animTimer % 7 === 0 && window.particleSystem) {
+          const noteChars = ['♪', '♫', '♬', '♩'];
+          const noteColors = ['#f43f5e', '#f59e0b', '#38bdf8', '#a855f7', '#fbbf24'];
+          window.particleSystem.particles.push({
+            x: this.x + this.facing * 30 + (Math.random() - 0.5) * 50,
+            y: this.y - this.height * 0.5 + (Math.random() - 0.5) * 40,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: -2.2 - Math.random() * 1.5,
+            noteText: noteChars[Math.floor(Math.random() * noteChars.length)],
+            color: noteColors[Math.floor(Math.random() * noteColors.length)],
+            size: 16 + Math.floor(Math.random() * 8),
+            life: 30,
+            maxLife: 30,
+            type: 'music_note'
+          });
+        }
+
+        // Electric rock stage sparks while shredding in pose 5
+        if (this.stateTimer >= 130 && this.animTimer % 3 === 0 && window.particleSystem) {
+          window.particleSystem.particles.push({
+            x: this.x + (Math.random() - 0.5) * 70,
+            y: this.y - 20 - Math.random() * 80,
+            vx: (Math.random() - 0.5) * 3,
+            vy: -2 - Math.random() * 3,
+            color: Math.random() > 0.5 ? '#f43f5e' : '#f59e0b',
+            life: 18,
+            maxLife: 18,
+            size: 3.5,
+            type: 'spark'
+          });
+        }
+      } else if (this.charId === 'cat') {
+        // Cat Kage Paw-Licking Shinobi Grooming Victory Sequence
+        if (this.stateTimer === 1) {
+          if (window.soundEngine) window.soundEngine.playSpecial();
+        } else if (this.stateTimer === 58) {
+          // Sitting down and lifting paw
+          if (window.soundEngine) window.soundEngine.playHitLight();
+        } else if (this.stateTimer === 88) {
+          // Licking paw with pink tongue - sparkling clean
+          if (window.soundEngine) window.soundEngine.playConfirm();
+          if (window.particleSystem) {
+            for (let i = 0; i < 12; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + this.facing * 22 + (Math.random() - 0.5) * 20,
+                y: this.y - this.height * 0.45 + (Math.random() - 0.5) * 20,
+                vx: (Math.random() - 0.5) * 2.5,
+                vy: -1.5 - Math.random() * 2,
+                color: Math.random() > 0.5 ? '#10b981' : '#f472b6', // emerald & cute pink
+                life: 18,
+                maxLife: 18,
+                size: 3,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 125) {
+          // Ear grooming with satisfied wink!
+          if (window.soundEngine) window.soundEngine.playSuperActivate();
+          if (window.particleSystem) {
+            window.particleSystem.shake(8);
+            window.particleSystem.addText(this.x, this.y - this.height - 35, "★ KAGE: PERFEIÇÃO FELINA! ★", "#10b981", 24);
+            for (let i = 0; i < 22; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 55,
+                y: this.y - Math.random() * 85,
+                vx: (Math.random() - 0.5) * 3.5,
+                vy: -2 - Math.random() * 3,
+                color: Math.random() > 0.4 ? '#10b981' : (Math.random() > 0.5 ? '#34d399' : '#f472b6'),
+                life: 22,
+                maxLife: 22,
+                size: 3.5,
+                type: 'spark'
+              });
+            }
+          }
+        }
+
+        // Gentle sparkles around face during grooming (pose 4 and 5)
+        if (this.stateTimer >= 88 && this.animTimer % 5 === 0 && window.particleSystem) {
+          window.particleSystem.particles.push({
+            x: this.x + this.facing * 18 + (Math.random() - 0.5) * 35,
+            y: this.y - this.height * 0.45 - Math.random() * 25,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: -1.5 - Math.random() * 1.5,
+            color: Math.random() > 0.5 ? '#34d399' : '#fbcfe8',
+            life: 16,
+            maxLife: 16,
+            size: 2.5,
+            type: 'spark'
+          });
+        }
+      } else if (this.charId === 'dog') {
+        // Unicão Graduation Victory Sequence
+        // Sound and fanfare are played EXCLUSIVELY when Unicão wins the round!
+        if (this.stateTimer === 1) {
+          // Putting on graduation gown over yellow shirt
+          if (window.soundEngine) window.soundEngine.playUnicaoCongratulations('robe');
+        } else if (this.stateTimer === 28) {
+          // Fastening collar button
+          if (window.soundEngine) window.soundEngine.playHitLight();
+        } else if (this.stateTimer === 58) {
+          // Putting on graduation cap
+          if (window.soundEngine) window.soundEngine.playUnicaoCongratulations('cap');
+          if (window.particleSystem) {
+            for (let i = 0; i < 8; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 35,
+                y: this.y - this.height * 0.95 - Math.random() * 15,
+                vx: (Math.random() - 0.5) * 2,
+                vy: -1.5 - Math.random() * 2,
+                color: Math.random() > 0.5 ? '#38bdf8' : '#fbbf24',
+                life: 18,
+                maxLife: 18,
+                size: 3,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 88) {
+          // Receiving diploma scroll
+          if (window.soundEngine) window.soundEngine.playUnicaoCongratulations('scroll');
+          if (window.particleSystem) {
+            for (let i = 0; i < 10; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + this.facing * 25 + (Math.random() - 0.5) * 20,
+                y: this.y - this.height * 0.5 + (Math.random() - 0.5) * 25,
+                vx: (Math.random() - 0.5) * 2,
+                vy: -1.5 - Math.random() * 2,
+                color: Math.random() > 0.4 ? '#ef4444' : '#fef08a',
+                life: 18,
+                maxLife: 18,
+                size: 3,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 125) {
+          // Triumphant Grand Congratulations Fanfare with diploma raised high!
+          if (window.soundEngine) window.soundEngine.playUnicaoCongratulations('fanfare');
+          if (window.particleSystem) {
+            window.particleSystem.shake(12);
+            window.particleSystem.addText(this.x, this.y - this.height - 35, "★ UNICÃO GRADUADO: CONGRATULATIONS! ★", "#0284c7", 24);
+            // Colorful graduation confetti explosion!
+            const confettiColors = ['#f59e0b', '#38bdf8', '#ec4899', '#10b981', '#fbbf24', '#a855f7'];
+            for (let i = 0; i < 35; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 80,
+                y: this.y - this.height * 0.6 - Math.random() * 80,
+                vx: (Math.random() - 0.5) * 6,
+                vy: -3 - Math.random() * 5,
+                color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+                life: 30,
+                maxLife: 30,
+                size: 4 + Math.random() * 3,
+                type: 'spark'
+              });
+            }
+          }
+        }
+
+        // Continuous celebratory confetti rain while Unicão raises his diploma (pose 5)
+        if (this.stateTimer >= 125 && this.animTimer % 4 === 0 && window.particleSystem) {
+          const confettiColors = ['#f59e0b', '#38bdf8', '#ec4899', '#10b981', '#fbbf24', '#a855f7', '#ffffff'];
+          window.particleSystem.particles.push({
+            x: this.x + (Math.random() - 0.5) * 90,
+            y: this.y - this.height - 20 - Math.random() * 50,
+            vx: (Math.random() - 0.5) * 2.5,
+            vy: 1.5 + Math.random() * 2.0, // gently falling celebration confetti
+            color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+            life: 35,
+            maxLife: 35,
+            size: 3.5 + Math.random() * 2.5,
+            type: 'spark'
+          });
+        }
+      } else if (this.charId === 'gorilla') {
+        // Gorilla Kongo Chest-Beating Victory Sequence
+        if (this.stateTimer === 1) {
+          if (window.soundEngine) window.soundEngine.playSpecial();
+        } else if (this.stateTimer === 24) {
+          // Left fist chest thump!
+          if (window.soundEngine) window.soundEngine.playHitHeavy();
+          if (window.particleSystem) {
+            window.particleSystem.shake(6);
+            for (let i = 0; i < 10; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + this.facing * 12 + (Math.random() - 0.5) * 25,
+                y: this.y - this.height * 0.65 + (Math.random() - 0.5) * 20,
+                vx: (Math.random() - 0.5) * 3,
+                vy: -1.5 - Math.random() * 2,
+                color: Math.random() > 0.5 ? '#f59e0b' : '#fbbf24',
+                life: 15,
+                maxLife: 15,
+                size: 3.5,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 50) {
+          // Right fist chest thump!
+          if (window.soundEngine) window.soundEngine.playHitHeavy();
+          if (window.particleSystem) {
+            window.particleSystem.shake(7);
+            for (let i = 0; i < 12; i++) {
+              window.particleSystem.particles.push({
+                x: this.x - this.facing * 8 + (Math.random() - 0.5) * 25,
+                y: this.y - this.height * 0.65 + (Math.random() - 0.5) * 20,
+                vx: (Math.random() - 0.5) * 3.5,
+                vy: -1.5 - Math.random() * 2,
+                color: Math.random() > 0.5 ? '#f59e0b' : '#fbbf24',
+                life: 15,
+                maxLife: 15,
+                size: 3.5,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 76) {
+          // Double fist chest pound with roar!
+          if (window.soundEngine) window.soundEngine.playHitHeavy();
+          if (window.particleSystem) {
+            window.particleSystem.shake(10);
+            for (let i = 0; i < 18; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 45,
+                y: this.y - this.height * 0.65 + (Math.random() - 0.5) * 25,
+                vx: (Math.random() - 0.5) * 4.5,
+                vy: -2 - Math.random() * 3,
+                color: Math.random() > 0.4 ? '#f59e0b' : '#fef08a',
+                life: 18,
+                maxLife: 18,
+                size: 4,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 112) {
+          // Mighty King Kong victory flex & roar!
+          if (window.soundEngine) window.soundEngine.playSuperActivate();
+          if (window.particleSystem) {
+            window.particleSystem.shake(14);
+            window.particleSystem.addText(this.x, this.y - this.height - 35, "★ KONGO: O REI PRIMATA! ★", "#eab308", 26);
+            for (let i = 0; i < 28; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 75,
+                y: this.y - this.height * 0.7 - Math.random() * 50,
+                vx: (Math.random() - 0.5) * 5.5,
+                vy: -3 - Math.random() * 4,
+                color: Math.random() > 0.4 ? '#eab308' : (Math.random() > 0.5 ? '#f59e0b' : '#fef08a'),
+                life: 25,
+                maxLife: 25,
+                size: 4.5,
+                type: 'spark'
+              });
+            }
+          }
+        }
+
+        // Continuous golden aura sparks during roaring flex (pose 5)
+        if (this.stateTimer >= 112 && this.animTimer % 4 === 0 && window.particleSystem) {
+          window.particleSystem.particles.push({
+            x: this.x + (Math.random() - 0.5) * 65,
+            y: this.y - 15 - Math.random() * 75,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -2 - Math.random() * 2,
+            color: Math.random() > 0.5 ? '#eab308' : '#fbbf24',
+            life: 20,
+            maxLife: 20,
+            size: 3.5,
+            type: 'spark'
+          });
         }
       }
     }

@@ -49,6 +49,10 @@ class GameEngine {
     // Controls Modal opened from Pause tracker
     this.openedControlsFromPause = false;
 
+    // Menu Navigation State (WASD & Arrows)
+    this.titleMenuIndex = 0;
+    this.selectFocusArea = 'grid'; // 'grid', 'stage', 'confirm', 'back'
+
     // Input Tracking
     this.keys = {};
 
@@ -57,10 +61,14 @@ class GameEngine {
     this.targetFps = 60;
     this.fixedStep = 1000 / this.targetFps; // 16.6667ms per tick
 
+    this.isPreloaded = false;
     this.initEventListeners();
     this.setupMobileGamepad();
     this.resizeCanvas();
     window.addEventListener('resize', () => this.resizeCanvas());
+
+    // Start Client-Side Preloader & Intro Video
+    this.initPreloader();
 
     // Start Game Loop
     this.lastTime = performance.now();
@@ -98,44 +106,26 @@ class GameEngine {
         }
       }
 
-      // Keyboard navigation on Character Select screen
-      if (this.state === 'SELECT') {
-        if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Space', 'KeyF', 'Escape'].includes(e.code)) {
+      // In FIGHT state and not paused:
+      if (this.state === 'FIGHT' && !this.isPaused) {
+        // Pause toggle
+        if (e.code === 'KeyP' || e.code === 'Escape') {
           e.preventDefault();
-          this.handleSelectNavigation(e.code);
+          this.togglePause();
           return;
         }
-      }
-
-      // Quick advance with Enter/Space on Prologue and Ladder screens
-      if (this.state === 'PROLOGUE') {
-        if (['Enter', 'Space', 'KeyF'].includes(e.code)) {
-          e.preventDefault();
-          this.startLadderFromPrologue();
-          return;
-        } else if (e.code === 'Escape') {
-          e.preventDefault();
-          this.openCharSelect(false);
-          return;
-        }
-      }
-
-      if (this.state === 'LADDER') {
-        if (['Enter', 'Space', 'KeyF'].includes(e.code)) {
-          e.preventDefault();
-          const currentOpponent = this.arcadeLadder[this.arcadeIndex];
-          this.startFight(this.selectedP1Char, currentOpponent, this.selectedStage, true);
-          return;
-        } else if (e.code === 'Escape') {
-          e.preventDefault();
-          this.openCharSelect(false);
+      } else {
+        // Universal Menu Navigation with WASD and Arrow Keys across ALL menus!
+        const navKeys = [
+          'KeyW', 'KeyA', 'KeyS', 'KeyD',
+          'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+          'Enter', 'Space', 'KeyF', 'KeyJ', 'Numpad1',
+          'Escape', 'KeyP'
+        ];
+        if (navKeys.includes(e.code)) {
+          this.handleMenuNavigation(e);
           return;
         }
-      }
-
-      // Pause toggle
-      if (e.code === 'KeyP' && this.state === 'FIGHT') {
-        this.togglePause();
       }
 
       // Prevent page scrolling on fighting keys
@@ -195,13 +185,19 @@ class GameEngine {
       controlsModal.classList.add('hidden');
       this.openedControlsFromPause = false;
       this.isPaused = true;
-      if (pauseMenu) pauseMenu.classList.remove('hidden');
+      if (pauseMenu) {
+        pauseMenu.classList.remove('hidden');
+        this.updateModalFocus(pauseMenu, 0);
+      }
       return;
     }
 
     this.isPaused = !this.isPaused;
     if (pauseMenu) {
       pauseMenu.classList.toggle('hidden', !this.isPaused);
+      if (this.isPaused) {
+        this.updateModalFocus(pauseMenu, 0);
+      }
     }
     if (this.isPaused) {
       this.resetKeys();
@@ -211,10 +207,10 @@ class GameEngine {
   cycleDifficulty(btn) {
     const difficulties = ['easy', 'medium', 'hard', 'nightmare'];
     const labels = {
-      easy: '⚡ DIFICULDADE: FÁCIL',
-      medium: '⚡ DIFICULDADE: MÉDIO',
-      hard: '⚡ DIFICULDADE: DIFÍCIL',
-      nightmare: '⚡ DIFICULDADE: PESADELO'
+      easy: 'DIFICULDADE: FÁCIL',
+      medium: 'DIFICULDADE: MÉDIO',
+      hard: 'DIFICULDADE: DIFÍCIL',
+      nightmare: 'DIFICULDADE: PESADELO'
     };
     const nextIdx = (difficulties.indexOf(this.selectedDifficulty) + 1) % difficulties.length;
     this.selectedDifficulty = difficulties[nextIdx];
@@ -277,7 +273,135 @@ class GameEngine {
     this.mobileControlsVisible = !this.mobileControlsVisible;
     vpad.classList.toggle('hidden', !this.mobileControlsVisible);
     if (toggleBtn) {
-      toggleBtn.innerText = this.mobileControlsVisible ? '📱 CONTROLES: ON' : '📱 CONTROLES: OFF';
+      toggleBtn.innerText = this.mobileControlsVisible ? 'CONTROLES: ON' : 'CONTROLES: OFF';
+    }
+  }
+
+  // --- Client-side Asset Preloading & Intro Video System ---
+
+  getAssetPreloadList() {
+    const list = [
+      'assets/images/portrait_dog.jpg',
+      'assets/images/portrait_emerson.jpg',
+      'assets/images/portrait_nata.jpg',
+      'assets/images/portrait_andrey.jpg',
+      'assets/images/portrait_alligator.jpg',
+      'assets/images/portrait_capybara.jpg',
+      'assets/images/portrait_owl.jpg',
+      'assets/images/portrait_tiger.jpg',
+      'assets/images/portrait_bear.jpg',
+      'assets/images/portrait_gorilla.jpg',
+      'assets/images/portrait_wolf.jpg',
+      'assets/images/portrait_cat.jpg',
+      'assets/images/portrait_dragon.jpg',
+      'assets/images/sprites/andrey_bot.png',
+      'assets/images/sprites/meteor_1.png',
+      'assets/images/sprites/meteor_2.png',
+      'assets/images/sprites/meteor_3.png',
+      'assets/images/sprites/meteor_4.png'
+    ];
+
+    if (window.SPRITE_META) {
+      for (const charId in window.SPRITE_META) {
+        for (const action in window.SPRITE_META[charId]) {
+          list.push(`assets/images/sprites/${charId}_${action}.png`);
+        }
+      }
+    }
+    return Array.from(new Set(list));
+  }
+
+  initPreloader() {
+    const preloader = document.getElementById('screen-preloader');
+    if (!preloader) {
+      this.isPreloaded = true;
+      return;
+    }
+
+    const video = document.getElementById('preloader-video');
+    if (video) {
+      video.muted = true;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Autoplay fallback
+        });
+      }
+      video.onended = () => {
+        if (this.isPreloaded) {
+          this.finishPreloading();
+        }
+      };
+    }
+
+    const list = this.getAssetPreloadList();
+    const total = list.length;
+    let loaded = 0;
+
+    const fill = document.getElementById('preloader-progress-fill');
+    const pctText = document.getElementById('preloader-percent-text');
+    const statusText = document.getElementById('preloader-status-text');
+    const resText = document.getElementById('preloader-res-name');
+    const startBtn = document.getElementById('btn-start-game');
+
+    const onAssetLoaded = (src) => {
+      loaded++;
+      const pct = Math.min(100, Math.floor((loaded / total) * 100));
+      if (fill) fill.style.width = `${pct}%`;
+      if (pctText) pctText.innerText = `${pct}%`;
+      if (resText && src) {
+        resText.innerText = `Carregando: ${src.split('/').pop()}`;
+      }
+
+      if (loaded >= total) {
+        this.isPreloaded = true;
+        if (statusText) statusText.innerText = 'TODOS OS RECURSOS PRONTOS';
+        if (resText) resText.innerText = `${total} imagens e sprites carregados no cache`;
+        if (fill) fill.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+        if (startBtn) startBtn.classList.remove('hidden');
+      }
+    };
+
+    // Parallel load into browser image cache
+    list.forEach(src => {
+      const img = new Image();
+      img.onload = () => onAssetLoaded(src);
+      img.onerror = () => onAssetLoaded(src);
+      img.src = src;
+    });
+  }
+
+  finishPreloading() {
+    const preloader = document.getElementById('screen-preloader');
+    if (!preloader || preloader.classList.contains('preloader-hidden')) return;
+
+    const video = document.getElementById('preloader-video');
+    if (video) {
+      video.pause();
+    }
+
+    if (window.soundEngine) {
+      window.soundEngine.init();
+      window.soundEngine.playConfirm();
+    }
+
+    preloader.classList.add('preloader-fade-out');
+    setTimeout(() => {
+      preloader.classList.add('preloader-hidden');
+      this.state = 'TITLE';
+      this.returnToTitle();
+    }, 450);
+  }
+
+  playIntroVideo() {
+    const preloader = document.getElementById('screen-preloader');
+    const video = document.getElementById('preloader-video');
+    const startBtn = document.getElementById('btn-start-game');
+    if (preloader && video) {
+      preloader.classList.remove('preloader-hidden', 'preloader-fade-out');
+      if (startBtn) startBtn.classList.remove('hidden');
+      video.currentTime = 0;
+      video.play().catch(() => {});
     }
   }
 
@@ -303,6 +427,8 @@ class GameEngine {
   openCharSelect(isVersus = false) {
     this.resetKeys();
     this.state = 'SELECT';
+    this.selectFocusArea = 'grid';
+    this.clearSelectActionsFocus();
     this.isVersusSelect = isVersus;
     this.activePicker = 'p1';
     this.hideAllScreens();
@@ -493,17 +619,12 @@ class GameEngine {
     if (this.state !== 'SELECT') return;
 
     // Movement keys
-    const isW = code === 'KeyW';
-    const isA = code === 'KeyA';
-    const isS = code === 'KeyS';
-    const isD = code === 'KeyD';
+    const isW = code === 'KeyW' || code === 'ArrowUp';
+    const isA = code === 'KeyA' || code === 'ArrowLeft';
+    const isS = code === 'KeyS' || code === 'ArrowDown';
+    const isD = code === 'KeyD' || code === 'ArrowRight';
 
-    const isUp = code === 'ArrowUp';
-    const isLeft = code === 'ArrowLeft';
-    const isDown = code === 'ArrowDown';
-    const isRight = code === 'ArrowRight';
-
-    const isConfirm = code === 'Enter' || code === 'Space' || code === 'KeyF' || code === 'Numpad1';
+    const isConfirm = code === 'Enter' || code === 'Space' || code === 'KeyF' || code === 'KeyJ' || code === 'Numpad1';
     const isBack = code === 'Escape';
 
     if (isBack) {
@@ -512,32 +633,101 @@ class GameEngine {
       return;
     }
 
-    if (isConfirm) {
-      this.confirmFighterSelection();
-      return;
-    }
-
-    let targetPlayer = null;
-    let dx = 0;
-    let dy = 0;
-
+    // In Versus mode, P1 uses WASD and P2 uses Arrow keys:
     if (this.isVersusSelect) {
-      if (isW) { targetPlayer = 'p1'; dy = -1; }
-      else if (isS) { targetPlayer = 'p1'; dy = 1; }
-      else if (isA) { targetPlayer = 'p1'; dx = -1; }
-      else if (isD) { targetPlayer = 'p1'; dx = 1; }
-      else if (isUp) { targetPlayer = 'p2'; dy = -1; }
-      else if (isDown) { targetPlayer = 'p2'; dy = 1; }
-      else if (isLeft) { targetPlayer = 'p2'; dx = -1; }
-      else if (isRight) { targetPlayer = 'p2'; dx = 1; }
-    } else {
-      targetPlayer = this.activePicker || 'p1';
-      if (isW || isUp) dy = -1;
-      else if (isS || isDown) dy = 1;
-      else if (isA || isLeft) dx = -1;
-      else if (isD || isRight) dx = 1;
+      const isP1Nav = ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(code);
+      const isP2Nav = ['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight'].includes(code);
+
+      if (isConfirm) {
+        this.confirmFighterSelection();
+        return;
+      }
+
+      if (isP1Nav) {
+        let dx = 0, dy = 0;
+        if (code === 'KeyW') dy = -1;
+        else if (code === 'KeyS') dy = 1;
+        else if (code === 'KeyA') dx = -1;
+        else if (code === 'KeyD') dx = 1;
+        this.navigateSelectGrid('p1', dx, dy);
+        return;
+      } else if (isP2Nav) {
+        let dx = 0, dy = 0;
+        if (code === 'ArrowUp') dy = -1;
+        else if (code === 'ArrowDown') dy = 1;
+        else if (code === 'ArrowLeft') dx = -1;
+        else if (code === 'ArrowRight') dx = 1;
+        this.navigateSelectGrid('p2', dx, dy);
+        return;
+      }
     }
 
+    // Solo or single picker mode
+    if (this.selectFocusArea === 'grid') {
+      let dx = 0, dy = 0;
+      if (isW) dy = -1;
+      else if (isS) dy = 1;
+      else if (isA) dx = -1;
+      else if (isD) dx = 1;
+
+      const roster = this.getRoster();
+      const currentChar = this.selectedP1Char;
+      const currentIndex = roster.indexOf(currentChar);
+      const isBottomRow = (currentIndex >= 6 && currentIndex <= 11 && roster.length <= 12) || (currentIndex === 12);
+
+      // Moving down from bottom row enters action buttons
+      if (isS && isBottomRow) {
+        this.selectFocusArea = 'confirm';
+        this.updateSelectActionsFocus();
+        if (window.soundEngine) window.soundEngine.playSelect();
+        return;
+      }
+
+      if (isConfirm) {
+        this.confirmFighterSelection();
+        return;
+      }
+
+      this.navigateSelectGrid(this.activePicker || 'p1', dx, dy);
+    } else {
+      // Bottom actions focus: 'stage', 'confirm', 'back'
+      if (isW) {
+        this.selectFocusArea = 'grid';
+        this.clearSelectActionsFocus();
+        if (window.soundEngine) window.soundEngine.playSelect();
+        return;
+      }
+
+      if (this.selectFocusArea === 'confirm') {
+        if (isA) {
+          this.selectFocusArea = 'stage';
+          this.updateSelectActionsFocus();
+        } else if (isD) {
+          this.selectFocusArea = 'back';
+          this.updateSelectActionsFocus();
+        } else if (isConfirm) {
+          this.confirmFighterSelection();
+        }
+      } else if (this.selectFocusArea === 'back') {
+        if (isA) {
+          this.selectFocusArea = 'confirm';
+          this.updateSelectActionsFocus();
+        } else if (isConfirm) {
+          if (window.soundEngine) window.soundEngine.playSelect();
+          this.returnToTitle();
+        }
+      } else if (this.selectFocusArea === 'stage') {
+        if (isD) {
+          this.selectFocusArea = 'confirm';
+          this.updateSelectActionsFocus();
+        } else if (isA || isConfirm || isS) {
+          this.cycleStage(1);
+        }
+      }
+    }
+  }
+
+  navigateSelectGrid(targetPlayer, dx, dy) {
     if (!targetPlayer || (dx === 0 && dy === 0)) return;
 
     const currentChar = targetPlayer === 'p1' ? this.selectedP1Char : this.selectedP2Char;
@@ -549,23 +739,21 @@ class GameEngine {
     let newIndex = currentIndex;
 
     if (dx !== 0) {
-      // Horizontal movement with wrap around
       newIndex = (currentIndex + dx + roster.length) % roster.length;
     } else if (dy !== 0) {
-      // Vertical movement between rows
-      if (dy < 0) { // Up
+      if (dy < 0) {
         if (currentIndex === 12) {
-          newIndex = 8; // Jump up to center of row 2 from Vulcanus
+          newIndex = 8;
         } else if (currentIndex >= COLS) {
           newIndex = currentIndex - COLS;
         } else {
           newIndex = Math.min(currentIndex + COLS, roster.length - 1);
         }
-      } else if (dy > 0) { // Down
+      } else if (dy > 0) {
         if (currentIndex < COLS) {
           newIndex = Math.min(currentIndex + COLS, roster.length - 1);
         } else if (currentIndex < 12 && roster.length > 12) {
-          newIndex = 12; // Jump down to Vulcanus from row 2
+          newIndex = 12;
         } else {
           newIndex = currentIndex % COLS;
         }
@@ -577,6 +765,43 @@ class GameEngine {
       if (window.soundEngine) window.soundEngine.playSelect();
       this.selectFighter(targetPlayer, nextChar, true);
     }
+  }
+
+  updateSelectActionsFocus() {
+    const stageBox = document.querySelector('.stage-select-box');
+    const btnConfirm = document.querySelector('.btn-confirm');
+    const btnBack = document.querySelector('.btn-back');
+
+    if (stageBox) stageBox.classList.toggle('arcade-menu-focus', this.selectFocusArea === 'stage');
+    if (btnConfirm) btnConfirm.classList.toggle('arcade-menu-focus', this.selectFocusArea === 'confirm');
+    if (btnBack) btnBack.classList.toggle('arcade-menu-focus', this.selectFocusArea === 'back');
+
+    if (this.selectFocusArea === 'stage') {
+      const stageDrop = document.getElementById('stage-dropdown');
+      if (stageDrop) stageDrop.focus();
+    } else if (this.selectFocusArea === 'confirm' && btnConfirm) {
+      btnConfirm.focus();
+    } else if (this.selectFocusArea === 'back' && btnBack) {
+      btnBack.focus();
+    }
+  }
+
+  clearSelectActionsFocus() {
+    const stageBox = document.querySelector('.stage-select-box');
+    const btnConfirm = document.querySelector('.btn-confirm');
+    const btnBack = document.querySelector('.btn-back');
+    if (stageBox) stageBox.classList.remove('arcade-menu-focus');
+    if (btnConfirm) btnConfirm.classList.remove('arcade-menu-focus');
+    if (btnBack) btnBack.classList.remove('arcade-menu-focus');
+  }
+
+  cycleStage(direction = 1) {
+    const dropdown = document.getElementById('stage-dropdown');
+    if (!dropdown) return;
+    const count = dropdown.options.length;
+    dropdown.selectedIndex = (dropdown.selectedIndex + direction + count) % count;
+    this.selectedStage = dropdown.value;
+    if (window.soundEngine) window.soundEngine.playSelect();
   }
 
   confirmFighterSelection() {
@@ -600,7 +825,10 @@ class GameEngine {
     this.state = 'PROLOGUE';
     this.hideAllScreens();
     const screen = document.getElementById('screen-prologue');
-    if (screen) screen.classList.remove('hidden');
+    if (screen) {
+      screen.classList.remove('hidden');
+      this.updateModalFocus(screen, 0);
+    }
 
     const hero = CHARACTERS[charId] || CHARACTERS['dog'];
     const img = document.getElementById('prologue-hero-img');
@@ -649,7 +877,11 @@ class GameEngine {
   openArcadeLadder() {
     this.state = 'LADDER';
     this.hideAllScreens();
-    document.getElementById('screen-ladder').classList.remove('hidden');
+    const screen = document.getElementById('screen-ladder');
+    if (screen) {
+      screen.classList.remove('hidden');
+      this.updateModalFocus(screen, 0);
+    }
 
     const ladderCont = document.getElementById('ladder-stages');
     if (!ladderCont) return;
@@ -666,7 +898,7 @@ class GameEngine {
       const item = document.createElement('div');
       item.className = `ladder-item ${isBoss ? 'ladder-boss' : ''} ${isCurrent ? 'ladder-current' : ''} ${isPassed ? 'ladder-passed' : ''}`;
       item.innerHTML = `
-        <div class="ladder-num">${charId === 'dragon' ? '★ CHEFÃO ★' : charId === 'emerson' ? '★ MESTRE ★' : `FASE ${idx + 1}`}</div>
+        <div class="ladder-num">${charId === 'dragon' ? 'CHEFÃO' : charId === 'emerson' ? 'MESTRE' : `FASE ${idx + 1}`}</div>
         <img src="${char.portrait}" class="ladder-thumb">
         <div class="ladder-info">
           <div class="ladder-name">${char.name.toUpperCase()}</div>
@@ -953,23 +1185,25 @@ class GameEngine {
     if (this.roundState === 'ACTIVE') {
       if (this.p1.isDead || this.p2.isDead) {
         this.roundState = 'SLOW_MO';
-        this.roundStateTimer = 160;
+        this.roundStateTimer = 280; // +120 frames (+2.0 seconds at 60 FPS) to show victory animations
 
         let winnerText = '';
         if (this.p1.isDead && this.p2.isDead) {
           winnerText = 'EMPATE!';
-          window.uiManager.showBanner('DOUBLE K.O.!', 'EMPATE BRUTAL', 120, '#ef4444');
+          window.uiManager.showBanner('DOUBLE K.O.!', 'EMPATE BRUTAL', 220, '#ef4444');
         } else if (this.p2.isDead) {
           this.p1.roundsWon++;
           winnerText = `${this.p1.charData.name.toUpperCase()} VENCEU!`;
           const isPerfect = this.p1.hp === this.p1.maxHp;
-          window.uiManager.showBanner('K.O.!', isPerfect ? '★ VITÓRIA PERFEITA! ★' : winnerText, 120, '#f59e0b');
+          window.uiManager.showBanner('K.O.!', isPerfect ? 'VITÓRIA PERFEITA!' : winnerText, 220, '#f59e0b');
           this.p1.state = 'VICTORY';
+          this.p1.stateTimer = 0;
         } else {
           this.p2.roundsWon++;
           winnerText = `${this.p2.charData.name.toUpperCase()} VENCEU!`;
-          window.uiManager.showBanner('K.O.!', winnerText, 120, '#ef4444');
+          window.uiManager.showBanner('K.O.!', winnerText, 220, '#ef4444');
           this.p2.state = 'VICTORY';
+          this.p2.stateTimer = 0;
         }
       }
     } else if (this.roundState === 'SLOW_MO') {
@@ -985,15 +1219,21 @@ class GameEngine {
 
   handleTimeOver() {
     this.roundState = 'SLOW_MO';
-    this.roundStateTimer = 150;
+    this.roundStateTimer = 270; // +120 frames (+2.0 seconds at 60 FPS) to show victory animations
     if (this.p1.hp > this.p2.hp) {
       this.p1.roundsWon++;
-      window.uiManager.showBanner('TEMPO ESGOTADO!', `${this.p1.charData.name.toUpperCase()} VENCE POR VIDA!`, 120, '#f59e0b');
+      window.uiManager.showBanner('TEMPO ESGOTADO!', `${this.p1.charData.name.toUpperCase()} VENCE POR VIDA!`, 220, '#f59e0b');
+      this.p1.state = 'VICTORY';
+      this.p1.stateTimer = 0;
+      this.p2.state = 'DEFEAT';
     } else if (this.p2.hp > this.p1.hp) {
       this.p2.roundsWon++;
-      window.uiManager.showBanner('TEMPO ESGOTADO!', `${this.p2.charData.name.toUpperCase()} VENCE POR VIDA!`, 120, '#ef4444');
+      window.uiManager.showBanner('TEMPO ESGOTADO!', `${this.p2.charData.name.toUpperCase()} VENCE POR VIDA!`, 220, '#ef4444');
+      this.p2.state = 'VICTORY';
+      this.p2.stateTimer = 0;
+      this.p1.state = 'DEFEAT';
     } else {
-      window.uiManager.showBanner('TEMPO ESGOTADO!', 'EMPATE!', 120, '#94a3b8');
+      window.uiManager.showBanner('TEMPO ESGOTADO!', 'EMPATE!', 220, '#94a3b8');
     }
   }
 
@@ -1030,7 +1270,10 @@ class GameEngine {
     this.state = 'STAGE_CLEAR';
     this.hideAllScreens();
     const screen = document.getElementById('screen-stage-clear');
-    if (screen) screen.classList.remove('hidden');
+    if (screen) {
+      screen.classList.remove('hidden');
+      this.updateModalFocus(screen, 0);
+    }
 
     const winner = CHARACTERS[winnerId] || CHARACTERS['dog'];
     const loser = CHARACTERS[loserId] || CHARACTERS['alligator'];
@@ -1066,7 +1309,11 @@ class GameEngine {
   openVictoryEnding() {
     this.state = 'VICTORY_ENDING';
     this.hideAllScreens();
-    document.getElementById('screen-ending').classList.remove('hidden');
+    const screen = document.getElementById('screen-ending');
+    if (screen) {
+      screen.classList.remove('hidden');
+      this.updateModalFocus(screen, 0);
+    }
 
     const hero = this.p1.charData;
     const img = document.getElementById('ending-hero-img');
@@ -1084,8 +1331,8 @@ class GameEngine {
       } else {
         storyElem.innerHTML = `
           Após uma batalha cataclísmica contra <strong>Vulcanus, o Dragão Ancestral</strong> nas profundezas do covil de magma, 
-          <strong>${hero.name}</strong> ergueu-se supremo como o novo soberano absoluto do reino animal!<br><br>
-          A paz e a honra foram restauradas e sua lenda ecoará pela eternidade nos anais do <strong>SUPER FIGHTERS</strong>!
+          <strong>${hero.name}</strong> ergueu-se supremo como o novo campeão absoluto da arena!<br><br>
+          A paz e a honra foram restauradas e sua lenda ecoará pela eternidade nos anais do <strong>SUPER FIGHTERS COMBAT</strong>!
         `;
       }
     }
@@ -1094,7 +1341,11 @@ class GameEngine {
   openContinueScreen() {
     this.state = 'CONTINUE';
     this.hideAllScreens();
-    document.getElementById('screen-continue').classList.remove('hidden');
+    const screen = document.getElementById('screen-continue');
+    if (screen) {
+      screen.classList.remove('hidden');
+      this.updateModalFocus(screen, 0);
+    }
 
     const currentOpponent = this.arcadeLadder[this.arcadeIndex] || 'dragon';
     const opp = CHARACTERS[currentOpponent] || { name: 'Oponente' };
@@ -1130,14 +1381,23 @@ class GameEngine {
   }
 
   openGameOver() {
+    this.state = 'GAMEOVER';
     this.hideAllScreens();
-    document.getElementById('screen-gameover').classList.remove('hidden');
+    const screen = document.getElementById('screen-gameover');
+    if (screen) {
+      screen.classList.remove('hidden');
+      this.updateModalFocus(screen, 0);
+    }
   }
 
   openVersusMatchOver(winner) {
     this.state = 'MATCH_OVER';
     this.hideAllScreens();
-    document.getElementById('screen-versus-win').classList.remove('hidden');
+    const screen = document.getElementById('screen-versus-win');
+    if (screen) {
+      screen.classList.remove('hidden');
+      this.updateModalFocus(screen, 0);
+    }
     document.getElementById('versus-win-img').src = winner.charData.portrait;
     document.getElementById('versus-win-text').innerText = `${winner.charData.name.toUpperCase()} É O VENCEDOR!`;
   }
@@ -1161,7 +1421,9 @@ class GameEngine {
     if (this.continueInterval) clearInterval(this.continueInterval);
     this.state = 'TITLE';
     this.hideAllScreens();
-    document.getElementById('screen-title').classList.remove('hidden');
+    const titleScreen = document.getElementById('screen-title');
+    if (titleScreen) titleScreen.classList.remove('hidden');
+    this.updateTitleFocus();
   }
 
   openControlsModal() {
@@ -1176,6 +1438,7 @@ class GameEngine {
     }
 
     controlsModal.classList.remove('hidden');
+    this.updateModalFocus(controlsModal, 0);
   }
 
   closeControlsModal() {
@@ -1189,7 +1452,266 @@ class GameEngine {
       if (pauseModal && this.state === 'FIGHT') {
         pauseModal.classList.remove('hidden');
         this.isPaused = true;
+        this.updateModalFocus(pauseModal, 0);
       }
+    } else if (this.state === 'TITLE') {
+      this.updateTitleFocus();
+    }
+  }
+
+  // --- Universal Keyboard Menu Navigation (WASD & Arrows) ---
+
+  handleMenuNavigation(e) {
+    const code = e.code;
+    const isW = code === 'KeyW' || code === 'ArrowUp';
+    const isS = code === 'KeyS' || code === 'ArrowDown';
+    const isA = code === 'KeyA' || code === 'ArrowLeft';
+    const isD = code === 'KeyD' || code === 'ArrowRight';
+    const isConfirm = ['Enter', 'Space', 'KeyF', 'KeyJ', 'Numpad1'].includes(code);
+    const isBack = code === 'Escape';
+
+    // 1. Controls Modal (if visible)
+    const controlsModal = document.getElementById('screen-controls');
+    if (controlsModal && !controlsModal.classList.contains('hidden')) {
+      if (isConfirm || isBack || isW || isS) {
+        e.preventDefault();
+        this.closeControlsModal();
+      }
+      return;
+    }
+
+    // 2. Pause Menu (if game is paused during fight)
+    const pauseMenu = document.getElementById('pause-modal');
+    if (this.isPaused && pauseMenu && !pauseMenu.classList.contains('hidden')) {
+      e.preventDefault();
+      if (code === 'KeyP' || isBack) {
+        this.togglePause();
+        return;
+      }
+      this.navigateModalButtons(pauseMenu, isW, isS, isA, isD, isConfirm, isBack, () => this.togglePause());
+      return;
+    }
+
+    // 3. Preloader / Character Intro Overlay (if visible)
+    const preloader = document.getElementById('screen-preloader');
+    if (preloader && !preloader.classList.contains('preloader-hidden')) {
+      if (isConfirm || isBack || isW || isS || isA || isD) {
+        e.preventDefault();
+        this.finishPreloading();
+      }
+      return;
+    }
+
+    // 4. Title Screen
+    if (this.state === 'TITLE') {
+      e.preventDefault();
+      this.navigateTitleMenu(isW, isS, isA, isD, isConfirm);
+      return;
+    }
+
+    // 5. Character Select Screen
+    if (this.state === 'SELECT') {
+      e.preventDefault();
+      this.handleSelectNavigation(code);
+      return;
+    }
+
+    // 6. Prologue Screen
+    if (this.state === 'PROLOGUE') {
+      e.preventDefault();
+      if (isConfirm || isD || isS) {
+        this.startLadderFromPrologue();
+      } else if (isBack || isA) {
+        this.openCharSelect(false);
+      }
+      return;
+    }
+
+    // 7. Ladder Screen
+    if (this.state === 'LADDER') {
+      e.preventDefault();
+      if (isConfirm || isD || isS) {
+        const currentOpponent = this.arcadeLadder[this.arcadeIndex];
+        this.startFight(this.selectedP1Char, currentOpponent, this.selectedStage, true);
+      } else if (isBack || isA) {
+        this.openCharSelect(false);
+      }
+      return;
+    }
+
+    // 8. Stage Clear Screen
+    const stageClearScreen = document.getElementById('screen-stage-clear');
+    if (this.state === 'STAGE_CLEAR' || (stageClearScreen && !stageClearScreen.classList.contains('hidden'))) {
+      e.preventDefault();
+      if (isConfirm || isD || isS) {
+        this.nextLadderStage();
+      }
+      return;
+    }
+
+    // 9. Continue Screen
+    if (this.state === 'CONTINUE') {
+      const continueScreen = document.getElementById('screen-continue');
+      if (continueScreen && !continueScreen.classList.contains('hidden')) {
+        e.preventDefault();
+        this.navigateModalButtons(continueScreen, isW, isS, isA, isD, isConfirm, isBack, () => this.openGameOver());
+        return;
+      }
+    }
+
+    // 10. Game Over Screen
+    const gameoverScreen = document.getElementById('screen-gameover');
+    if (this.state === 'GAMEOVER' || (gameoverScreen && !gameoverScreen.classList.contains('hidden'))) {
+      e.preventDefault();
+      if (isConfirm || isBack || isW || isS) {
+        this.returnToTitle();
+      }
+      return;
+    }
+
+    // 11. Versus Match Win Screen
+    if (this.state === 'VERSUS_WIN' || this.state === 'MATCH_OVER') {
+      const versusWinScreen = document.getElementById('screen-versus-win');
+      if (versusWinScreen && !versusWinScreen.classList.contains('hidden')) {
+        e.preventDefault();
+        this.navigateModalButtons(versusWinScreen, isW, isS, isA, isD, isConfirm, isBack, () => this.returnToTitle());
+        return;
+      }
+    }
+
+    // 12. Ending Epilogue Screen
+    if (this.state === 'VICTORY_ENDING' || this.state === 'ENDING') {
+      const endingScreen = document.getElementById('screen-ending');
+      if (endingScreen && !endingScreen.classList.contains('hidden')) {
+        e.preventDefault();
+        if (isConfirm || isBack || isW || isS) {
+          this.returnToTitle();
+        }
+        return;
+      }
+    }
+  }
+
+  getTitleButtons() {
+    const container = document.getElementById('screen-title');
+    if (!container) return [];
+    return Array.from(container.querySelectorAll('.arcade-btn, .arcade-btn-mini'));
+  }
+
+  navigateTitleMenu(isW, isS, isA, isD, isConfirm) {
+    const buttons = this.getTitleButtons();
+    if (!buttons || buttons.length === 0) return;
+
+    if (this.titleMenuIndex < 0 || this.titleMenuIndex >= buttons.length) {
+      this.titleMenuIndex = 0;
+    }
+
+    if (isConfirm) {
+      if (window.soundEngine) window.soundEngine.playConfirm();
+      const targetBtn = buttons[this.titleMenuIndex];
+      if (targetBtn) targetBtn.click();
+      return;
+    }
+
+    const prevIndex = this.titleMenuIndex;
+
+    // 0..3: MODO SOLO, VERSUS PVP, VERSUS CPU, MODO TREINO
+    // 4..8: VER APRESENTAÇÃO, DIFICULDADE, CONTROLES, SFX, MÚSICA
+    if (isW) {
+      if (this.titleMenuIndex >= 4) {
+        this.titleMenuIndex = 3; // Jump back up from bottom row to Training mode
+      } else if (this.titleMenuIndex === 0) {
+        this.titleMenuIndex = buttons.length - 1; // Wrap around to bottom
+      } else {
+        this.titleMenuIndex--;
+      }
+    } else if (isS) {
+      if (this.titleMenuIndex === 3) {
+        this.titleMenuIndex = 4; // Jump down to bottom row
+      } else if (this.titleMenuIndex >= 4) {
+        this.titleMenuIndex = 0; // Wrap around to top
+      } else {
+        this.titleMenuIndex++;
+      }
+    } else if (isD) {
+      if (this.titleMenuIndex >= 4) {
+        this.titleMenuIndex = 4 + ((this.titleMenuIndex - 4 + 1) % 5);
+      } else {
+        this.titleMenuIndex = (this.titleMenuIndex + 1) % 4;
+      }
+    } else if (isA) {
+      if (this.titleMenuIndex >= 4) {
+        this.titleMenuIndex = 4 + ((this.titleMenuIndex - 4 - 1 + 5) % 5);
+      } else {
+        this.titleMenuIndex = (this.titleMenuIndex - 1 + 4) % 4;
+      }
+    }
+
+    if (this.titleMenuIndex !== prevIndex) {
+      if (window.soundEngine) window.soundEngine.playSelect();
+      this.updateTitleFocus();
+    }
+  }
+
+  updateTitleFocus() {
+    const buttons = this.getTitleButtons();
+    if (!buttons || buttons.length === 0) return;
+    buttons.forEach((btn, idx) => {
+      btn.classList.toggle('arcade-menu-focus', idx === this.titleMenuIndex);
+    });
+    if (buttons[this.titleMenuIndex]) {
+      buttons[this.titleMenuIndex].focus();
+    }
+  }
+
+  navigateModalButtons(container, isW, isS, isA, isD, isConfirm, isBack, onBackCallback) {
+    if (!container) return;
+    const buttons = Array.from(container.querySelectorAll('button:not(.hidden)'));
+    if (!buttons || buttons.length === 0) return;
+
+    if (isBack) {
+      if (onBackCallback) onBackCallback();
+      return;
+    }
+
+    let currentIndex = buttons.findIndex(b => b.classList.contains('arcade-menu-focus'));
+    if (currentIndex === -1) currentIndex = 0;
+
+    if (isConfirm) {
+      if (window.soundEngine) window.soundEngine.playConfirm();
+      if (buttons[currentIndex]) {
+        buttons[currentIndex].click();
+      }
+      return;
+    }
+
+    const prevIndex = currentIndex;
+    if (isW || isA) {
+      currentIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+    } else if (isS || isD) {
+      currentIndex = (currentIndex + 1) % buttons.length;
+    }
+
+    if (currentIndex !== prevIndex) {
+      if (window.soundEngine) window.soundEngine.playSelect();
+      buttons.forEach((btn, idx) => {
+        btn.classList.toggle('arcade-menu-focus', idx === currentIndex);
+      });
+      if (buttons[currentIndex]) {
+        buttons[currentIndex].focus();
+      }
+    }
+  }
+
+  updateModalFocus(container, defaultIndex = 0) {
+    if (!container) return;
+    const buttons = Array.from(container.querySelectorAll('button:not(.hidden)'));
+    if (!buttons || buttons.length === 0) return;
+    buttons.forEach((btn, idx) => {
+      btn.classList.toggle('arcade-menu-focus', idx === defaultIndex);
+    });
+    if (buttons[defaultIndex]) {
+      buttons[defaultIndex].focus();
     }
   }
 

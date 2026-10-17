@@ -1,4 +1,4 @@
-// Smart AI Controller for CPU Opponents in Animal Kombat
+// Smart AI Controller for CPU Opponents in Super Fighters Combat
 
 class FightingAI {
   constructor(fighter, difficulty = 'medium') {

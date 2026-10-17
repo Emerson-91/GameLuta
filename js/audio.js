@@ -1,4 +1,4 @@
-// Audio Synthesizer for Animal Kombat
+// Audio Synthesizer for Super Fighters Combat
 // Uses Web Audio API for zero-latency, arcade-style sound effects & dynamic retro BGM
 
 class SoundEngine {
@@ -240,6 +240,260 @@ class SoundEngine {
 
     this.playNoise(0.4, 0.5, 300);
   }
+
+  // --- Electric Guitar Synthesizer (Overdrive / Amp Distortion) ---
+  getDistortionCurve(amount = 50) {
+    if (this._distCurve && this._distAmount === amount) return this._distCurve;
+    const n = 44100;
+    const curve = new Float32Array(n);
+    const deg = Math.PI / 180;
+    for (let i = 0; i < n; ++i) {
+      const x = (i * 2) / n - 1;
+      curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+    }
+    this._distCurve = curve;
+    this._distAmount = amount;
+    return curve;
+  }
+
+  playGuitarNote(freq, startTime, duration = 0.4, volume = 0.35, bendTo = null, vibrato = false) {
+    if (!this.ctx || !this.sfxEnabled) return;
+    const t = startTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(freq, t);
+    if (bendTo) {
+      osc.frequency.exponentialRampToValueAtTime(bendTo, t + duration * 0.7);
+    }
+
+    if (vibrato) {
+      const lfo = this.ctx.createOscillator();
+      const lfoGain = this.ctx.createGain();
+      lfo.frequency.setValueAtTime(6.5, t);
+      lfoGain.gain.setValueAtTime(freq * 0.035, t);
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      lfo.start(t + duration * 0.2);
+      lfo.stop(t + duration);
+    }
+
+    const shaper = this.ctx.createWaveShaper();
+    shaper.curve = this.getDistortionCurve(45);
+    shaper.oversample = '4x';
+
+    const cabFilter = this.ctx.createBiquadFilter();
+    cabFilter.type = 'lowpass';
+    cabFilter.frequency.setValueAtTime(3200, t);
+
+    const midBoost = this.ctx.createBiquadFilter();
+    midBoost.type = 'peaking';
+    midBoost.frequency.setValueAtTime(1400, t);
+    midBoost.gain.setValueAtTime(6, t);
+
+    gain.gain.setValueAtTime(volume, t);
+    gain.gain.setValueAtTime(volume * 0.9, t + duration * 0.4);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+    osc.connect(shaper);
+    shaper.connect(midBoost);
+    midBoost.connect(cabFilter);
+    cabFilter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + duration);
+  }
+
+  // Nata's Exclusive Electric Guitar Victory Riff & Solo
+  // Only played when Nata wins the round!
+  playNataGuitarVictory(stage = 'strum') {
+    if (!this.sfxEnabled) return;
+    this.init();
+    const now = this.ctx.currentTime;
+
+    if (stage === 'prep') {
+      // Plug-in cable click + amp hum crunch
+      this.playHitLight();
+      this.playNoise(0.08, 0.25, 1200);
+    } else if (stage === 'chord') {
+      // Crunchy opening power chord (E5)
+      [164.8, 246.9, 329.6].forEach(f => {
+        this.playGuitarNote(f, now, 0.35, 0.25);
+      });
+    } else if (stage === 'strum') {
+      // Crunchy rock power chord strum progression (D5 -> E5 -> G5)
+      const chords = [
+        { freqs: [146.8, 220.0, 293.7], delay: 0.00, dur: 0.26 }, // D5
+        { freqs: [164.8, 246.9, 329.6], delay: 0.16, dur: 0.26 }, // E5
+        { freqs: [196.0, 293.7, 392.0], delay: 0.34, dur: 0.42 }, // G5
+      ];
+      chords.forEach(c => {
+        c.freqs.forEach(f => {
+          this.playGuitarNote(f, now + c.delay, c.dur, 0.22);
+        });
+      });
+    } else if (stage === 'solo') {
+      // Epic Rock Solo Lick! Screaming high notes with bends, vibrato and final power chord sustain
+      const soloNotes = [
+        { f: 587.3, d: 0.00, dur: 0.16, bend: null, vib: false },       // D5
+        { f: 659.3, d: 0.14, dur: 0.18, bend: null, vib: false },       // E5
+        { f: 783.9, d: 0.30, dur: 0.24, bend: 880.0, vib: true },       // G5 bend to A5
+        { f: 880.0, d: 0.52, dur: 0.22, bend: null, vib: false },       // A5
+        { f: 987.8, d: 0.72, dur: 0.26, bend: 1046.5, vib: true },      // B5 bend to C6
+        { f: 1174.7, d: 0.96, dur: 0.32, bend: 1318.5, vib: true },     // D6 bend to E6 high solo!
+      ];
+      soloNotes.forEach(n => {
+        this.playGuitarNote(n.f, now + n.d, n.dur, 0.28, n.bend, n.vib);
+      });
+
+      // Huge sustained triumphant E power chord backing the solo crescendo!
+      const powerChord = [164.8, 246.9, 329.6, 659.3];
+      powerChord.forEach(f => {
+        this.playGuitarNote(f, now + 1.25, 1.8, 0.32, null, true);
+      });
+    }
+  }
+
+  // --- Brass and Chime Synthesizer for Celebrations ---
+  playBrassNote(freq, startTime, duration = 0.4, volume = 0.28, isTrumpet = true) {
+    if (!this.ctx || !this.sfxEnabled) return;
+    const t = startTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = isTrumpet ? 'sawtooth' : 'triangle';
+    osc.frequency.setValueAtTime(freq, t);
+
+    // Warm brass filter envelope: opens swiftly on attack, settles slightly on sustain
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(450, t);
+    filter.frequency.exponentialRampToValueAtTime(isTrumpet ? 3200 : 1800, t + 0.04);
+    filter.frequency.exponentialRampToValueAtTime(isTrumpet ? 2400 : 1200, t + duration * 0.5);
+
+    // Volume envelope
+    gain.gain.setValueAtTime(0.001, t);
+    gain.gain.linearRampToValueAtTime(volume, t + 0.03);
+    gain.gain.setValueAtTime(volume * 0.85, t + duration * 0.6);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + duration);
+  }
+
+  playChimeNote(freq, startTime, duration = 0.6, volume = 0.18) {
+    if (!this.ctx || !this.sfxEnabled) return;
+    const t = startTime;
+    const osc = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+
+    // Subtle overtone for bell clarity
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(freq * 2.76, t);
+
+    gain.gain.setValueAtTime(volume, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+    osc.connect(gain);
+    osc2.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc2.start(t);
+    osc.stop(t + duration);
+    osc2.stop(t + duration);
+  }
+
+  // Unicão's Exclusive Graduation "CONGRATULATIONS!" Fanfare
+  // ONLY played when Unicão wins the round!
+  playUnicaoCongratulations(stage = 'fanfare') {
+    if (!this.sfxEnabled) return;
+    this.init();
+    const now = this.ctx.currentTime;
+
+    if (stage === 'robe') {
+      // Gentle ceremonial prelude chord as Unicão puts on his graduation gown
+      [130.8, 196.0, 261.6].forEach(f => { // C3, G3, C4
+        this.playBrassNote(f, now, 0.45, 0.22, false);
+      });
+    } else if (stage === 'cap') {
+      // Mortarboard cap placement: ascending sparkling chime flourish
+      const chimes = [523.3, 659.3, 783.9, 1046.5]; // C5, E5, G5, C6
+      chimes.forEach((f, idx) => {
+        this.playChimeNote(f, now + idx * 0.08, 0.5, 0.16);
+      });
+    } else if (stage === 'scroll') {
+      // Receiving diploma scroll: noble brass swell
+      const swellNotes = [
+        { f: 174.6, d: 0.00, dur: 0.4 }, // F3
+        { f: 220.0, d: 0.08, dur: 0.4 }, // A3
+        { f: 261.6, d: 0.16, dur: 0.45 }, // C4
+        { f: 349.2, d: 0.24, dur: 0.5 }, // F4
+      ];
+      swellNotes.forEach(n => {
+        this.playBrassNote(n.f, now + n.d, n.dur, 0.24, true);
+      });
+    } else if (stage === 'fanfare' || stage === 'full') {
+      // GRAND CONGRATULATIONS FANFARE!
+      // Triumphant trumpet fanfare melody (Ta-da-da-DAAA!)
+      const fanfareMelody = [
+        { f: 392.0, d: 0.00, dur: 0.15 }, // G4
+        { f: 523.3, d: 0.16, dur: 0.15 }, // C5
+        { f: 659.3, d: 0.32, dur: 0.15 }, // E5
+        { f: 783.9, d: 0.48, dur: 0.32 }, // G5
+        { f: 698.5, d: 0.82, dur: 0.14 }, // F5
+        { f: 880.0, d: 0.98, dur: 0.14 }, // A5
+        { f: 987.8, d: 1.14, dur: 0.16 }, // B5
+        { f: 1046.5, d: 1.32, dur: 1.80 }  // High Triumphant C6!
+      ];
+      fanfareMelody.forEach(m => {
+        this.playBrassNote(m.f, now + m.d, m.dur, 0.30, true);
+      });
+
+      // Majestic Brass Harmony Chords
+      // 1. C Major
+      [130.8, 196.0, 261.6, 329.6].forEach(f => {
+        this.playBrassNote(f, now, 0.45, 0.20, false);
+      });
+      // 2. F Major
+      [174.6, 220.0, 261.6, 349.2].forEach(f => {
+        this.playBrassNote(f, now + 0.82, 0.30, 0.20, false);
+      });
+      // 3. G Major
+      [196.0, 246.9, 293.7, 392.0].forEach(f => {
+        this.playBrassNote(f, now + 1.14, 0.20, 0.22, false);
+      });
+      // 4. Grand Final Sustained C Major Chord!
+      [130.8, 261.6, 329.6, 392.0, 523.3, 659.3].forEach(f => {
+        this.playBrassNote(f, now + 1.32, 2.0, 0.26, false);
+      });
+
+      // Celebratory Cascading Glockenspiel / Star Chimes during victory climax
+      const starChimes = [
+        { f: 1046.5, d: 1.36 }, // C6
+        { f: 1318.5, d: 1.48 }, // E6
+        { f: 1567.9, d: 1.60 }, // G6
+        { f: 1975.5, d: 1.72 }, // B6
+        { f: 2093.0, d: 1.84 }, // C7
+        { f: 2637.0, d: 1.96 }, // E7
+        { f: 3135.9, d: 2.10 }  // G7 super sparkle
+      ];
+      starChimes.forEach(sc => {
+        this.playChimeNote(sc.f, now + sc.d, 0.7, 0.18);
+      });
+    }
+  }
+
 
   // Round start bell
   playRoundStart() {

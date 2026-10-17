@@ -1,4 +1,4 @@
-// Visual Effects, Projectiles and Particle System for Animal Kombat
+// Visual Effects, Projectiles and Particle System for Super Fighters Combat
 
 class ParticleSystem {
   constructor() {
@@ -13,12 +13,22 @@ class ParticleSystem {
     // Andrey's Combat Bot sprite
     this.botImg = new Image();
     this.botImg.src = 'assets/images/sprites/andrey_bot.png';
+
+    // Vulcanus Dragon Meteor Sprites (4 variants)
+    this.meteorImgs = [1, 2, 3, 4].map(idx => {
+      const img = new Image();
+      img.src = `assets/images/sprites/meteor_${idx}.png`;
+      return img;
+    });
+
+    this.meteorShowers = [];
   }
 
   reset() {
     this.particles = [];
     this.projectiles = [];
     this.bots = [];
+    this.meteorShowers = [];
     this.floatingTexts = [];
     this.screenShake = 0;
     this.superFreezeTimer = 0;
@@ -158,7 +168,7 @@ class ParticleSystem {
     const startY = owner.y - owner.height * 0.65;
 
     let speed = 9;
-    let damage = 80 * owner.power;
+    let damage = 90 * owner.power;
     let radius = 18;
     let color = owner.themeColor;
 
@@ -169,12 +179,12 @@ class ParticleSystem {
       color = '#ef4444';
     } else if (type === 'boulder') {
       speed = 7.5;
-      damage = 110 * owner.power;
+      damage = 95 * owner.power;
       radius = 22;
       color = '#71717a';
     } else if (type === 'feather_blade') {
       speed = 12;
-      damage = 65 * owner.power;
+      damage = 90 * owner.power;
       radius = 14;
       color = '#c084fc';
     } else if (type === 'zen_orb') {
@@ -183,45 +193,70 @@ class ParticleSystem {
       radius = 20;
       color = '#fbbf24';
     } else if (type === 'bone_blast') {
-      speed = 12.5;
-      damage = 115 * owner.power; // Unicão's Cosmic Astral Blast!
+      speed = 12;
+      damage = 95 * owner.power;
       radius = 24;
       color = '#38bdf8';
       this.shake(9);
     } else if (type === 'server_packet') {
-      speed = 13.5;
-      damage = 145 * owner.power; // Emerson's super powerful cyber surge!
+      speed = 12.5;
+      damage = 95 * owner.power;
       radius = 24;
       color = '#06b6d4';
     } else if (type === 'code_tag') {
       speed = 11.5;
-      damage = 100 * owner.power; // Natã's fast HTML/CSS tag special
+      damage = 90 * owner.power;
       radius = 18;
       color = '#f97316';
     } else if (type === 'ai_robot') {
-      speed = 12.8;
-      damage = 135 * owner.power; // Andrey's autonomous AI Combat Robot
+      speed = 12;
+      damage = 95 * owner.power;
       radius = 25;
       color = '#10b981';
       this.shake(8);
+    } else if (type === 'mud_splash') {
+      speed = 12;
+      damage = 95 * owner.power;
+      radius = 26;
+      color = '#22c55e';
+      this.shake(8);
+    } else if (type === 'ice_spike') {
+      speed = 12;
+      damage = 95 * owner.power;
+      radius = 24;
+      color = '#38bdf8';
+      this.shake(9);
+    } else if (type === 'fire_kick_crescent') {
+      speed = 15;
+      damage = 240 * owner.power; // Capybara Mestre Kai Blazing Crescent Wave from Kick!
+      radius = 35;
+      color = '#f59e0b';
+      this.shake(16);
+      this.addText(owner.x, owner.y - owner.height - 35, "★ CHUTE CRESCENTE CHI! ★", "#f59e0b", 28);
     } else if (type === 'code_hadouken') {
       speed = 14;
-      damage = 260 * owner.power; // Natã's massive HTML/CSS Hadouken Super!
+      damage = 240 * owner.power; // Natã's massive HTML/CSS Hadouken Super!
       radius = 34;
       color = '#f97316';
       this.shake(16);
       this.addText(owner.x, owner.y - owner.height - 35, "HADOUKEN CSS & HTML!", "#f97316", 28);
     } else if (type === 'meteor') {
-      // Dragon Boss special meteor falling from the sky!
+      // Dragon Boss special meteor falling from the sky across the stage!
+      let stageW = 1400;
+      if (window.stageManager && window.stageManager.getCurrentStage) {
+        const cs = window.stageManager.getCurrentStage();
+        if (cs && cs.width) stageW = cs.width;
+      }
       this.projectiles.push({
         owner,
         type: 'meteor',
-        x: Math.random() * 800 + 200,
-        y: -50,
-        vx: (Math.random() - 0.5) * 2,
-        vy: 10,
-        radius: 25,
-        damage: 120,
+        variant: Math.floor(Math.random() * 4) + 1,
+        x: Math.random() * (stageW - 140) + 70,
+        y: -70,
+        vx: (Math.random() - 0.5) * 4,
+        vy: 12 + Math.random() * 3,
+        radius: 30,
+        damage: 100,
         color: '#ea580c',
         life: 120,
         isFalling: true
@@ -336,7 +371,7 @@ class ParticleSystem {
     }
   }
 
-  // Spawn Andrey's 2 Combat Bots from the sky, hovering and shooting downward for 3 seconds!
+  // Spawn Andrey's Combat Bots from the sky: Super = 1 bot, Special = 2 bots
   spawnAndreyBots(owner, isSuper = false) {
     let targetX = owner.x + owner.facing * 230;
     if (window.gameEngine && window.gameEngine.p1 && window.gameEngine.p2) {
@@ -344,40 +379,111 @@ class ParticleSystem {
       if (opp) targetX = opp.x;
     }
 
-    this.shake(9);
-    this.addText(owner.x, owner.y - owner.height - 35, "DRONES IA ENVIADOS!", "#f97316", 22);
+    this.shake(isSuper ? 16 : 9);
+    this.addText(
+      owner.x,
+      owner.y - owner.height - 35,
+      isSuper ? "★ MEGA DRONE IA SUPREMO! ★" : "ESQUADRÃO 2x DRONES IA!",
+      isSuper ? "#ef4444" : "#f97316",
+      isSuper ? 26 : 22
+    );
 
-    // Bot 1: descends from above left
-    this.bots.push({
-      owner,
-      isSuper,
-      x: targetX - 70,
-      y: -95,
-      hoverY: 130,
-      offsetX: -70,
-      state: 'enter',
-      timer: 180, // 3 seconds at 60 FPS
-      shootCooldown: 8,
-      shootMuzzleToggle: false,
-      muzzleTimer: 0,
-      vy: 0
-    });
+    if (isSuper) {
+      // O SUPER é somente UM bot voando! (Mega Drone IA centralizado com disparo rápido e pesado)
+      this.bots.push({
+        owner,
+        isSuper: true,
+        x: targetX,
+        y: -120,
+        hoverY: 130,
+        offsetX: 0,
+        scale: 1.35,
+        state: 'enter',
+        timer: 200,
+        shootCooldown: 5,
+        shootMuzzleToggle: false,
+        muzzleTimer: 0,
+        vy: 0
+      });
+    } else {
+      // O ESPECIAL são DOIS bots voando!
+      // Bot 1: descende pela esquerda
+      this.bots.push({
+        owner,
+        isSuper: false,
+        x: targetX - 70,
+        y: -95,
+        hoverY: 130,
+        offsetX: -70,
+        scale: 1.0,
+        state: 'enter',
+        timer: 180, // 3 segundos a 60 FPS
+        shootCooldown: 8,
+        shootMuzzleToggle: false,
+        muzzleTimer: 0,
+        vy: 0
+      });
 
-    // Bot 2: descends from above right
-    this.bots.push({
+      // Bot 2: descende pela direita
+      this.bots.push({
+        owner,
+        isSuper: false,
+        x: targetX + 70,
+        y: -145,
+        hoverY: 155,
+        offsetX: 70,
+        scale: 1.0,
+        state: 'enter',
+        timer: 180, // 3 segundos a 60 FPS
+        shootCooldown: 12,
+        shootMuzzleToggle: true,
+        muzzleTimer: 0,
+        vy: 0
+      });
+    }
+  }
+
+  // Spawn Dragon Vulcanus's Special: Meteor Shower falling randomly for 3 seconds!
+  spawnDragonMeteorShower(owner, durationFrames = 180) {
+    if (!this.meteorShowers) this.meteorShowers = [];
+    this.meteorShowers.push({
       owner,
-      isSuper,
-      x: targetX + 70,
-      y: -145,
-      hoverY: 155,
-      offsetX: 70,
-      state: 'enter',
-      timer: 180, // 3 seconds at 60 FPS
-      shootCooldown: 12,
-      shootMuzzleToggle: true,
-      muzzleTimer: 0,
-      vy: 0
+      timer: durationFrames, // 180 frames = 3 seconds at 60 FPS
+      spawnCooldown: 0
     });
+  }
+
+  // Spawn Dragon Vulcanus's Super: Colossal Raging Magma Flame Torrent!
+  spawnDragonSuperFlame(owner) {
+    const dir = owner.facing;
+    const startX = owner.x + dir * (owner.width * 0.95);
+    const startY = owner.y - owner.height * 0.45;
+
+    this.shake(22);
+    this.addText(owner.x, owner.y - owner.height - 35, "★ CATACLISMO DO MAGMA! ★", "#ef4444", 28);
+
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        if (!owner.isDead) {
+          this.projectiles.push({
+            owner,
+            type: 'dragon_fire',
+            x: startX + dir * (i * 35),
+            y: startY + (i - 2) * 8,
+            vx: dir * (15 + Math.random() * 3),
+            vy: (Math.random() - 0.5) * 2,
+            radius: 38,
+            damage: 55 * owner.power,
+            color: '#ef4444',
+            life: 85
+          });
+          this.createFlameBurst(startX, startY, 18, '#ea580c');
+          if (window.soundEngine && Math.random() < 0.5) {
+            window.soundEngine.playHitHeavy();
+          }
+        }
+      }, i * 85);
+    }
   }
 
   update(fighters) {
@@ -419,6 +525,9 @@ class ParticleSystem {
         p.x += p.vx;
         p.y += p.vy;
         p.size *= 0.94;
+      } else if (p.type === 'music_note') {
+        p.x += p.vx + Math.sin((p.maxLife - p.life) * 0.18) * 0.9;
+        p.y += p.vy;
       }
       if (p.life <= 0) {
         this.particles.splice(i, 1);
@@ -470,23 +579,24 @@ class ParticleSystem {
           // Shooting downward
           bot.shootCooldown--;
           if (bot.shootCooldown <= 0) {
-            bot.shootCooldown = 6; // shoots every 6 frames = 10 shots/sec per bot
+            bot.shootCooldown = bot.isSuper ? 4 : 7; // Super bot shoots continuous concentrated barrage
             bot.shootMuzzleToggle = !bot.shootMuzzleToggle;
             bot.muzzleTimer = 3;
 
-            const spawnX = bot.x + (bot.shootMuzzleToggle ? -14 : 14);
-            const spawnY = bot.y + 24;
+            const scale = bot.scale || 1.0;
+            const spawnX = bot.x + (bot.shootMuzzleToggle ? -14 * scale : 14 * scale);
+            const spawnY = bot.y + 24 * scale;
 
             this.projectiles.push({
               owner: bot.owner,
               type: 'bot_laser',
               x: spawnX,
               y: spawnY,
-              vx: (Math.random() - 0.5) * 1.2,
-              vy: 16.5,
-              radius: 12,
-              damage: (bot.isSuper ? 8.5 : 6.5) * (bot.owner ? bot.owner.power : 1),
-              color: '#f97316',
+              vx: (Math.random() - 0.5) * (bot.isSuper ? 2.0 : 1.2),
+              vy: bot.isSuper ? 18.5 : 16.5,
+              radius: bot.isSuper ? 16 : 12,
+              damage: (bot.isSuper ? 17.5 : 6.5) * (bot.owner ? bot.owner.power : 1),
+              color: bot.isSuper ? '#ef4444' : '#f97316',
               life: 75,
               isFalling: true
             });
@@ -524,6 +634,83 @@ class ParticleSystem {
           if (bot.y < -150) {
             this.bots.splice(b, 1);
           }
+        }
+      }
+    }
+
+    // Update Dragon Vulcanus's Meteor Shower (falls across diverse areas of the entire scenery)
+    if (this.meteorShowers && this.meteorShowers.length > 0) {
+      let stageWidth = 1400;
+      let groundY = 480;
+      if (window.stageManager && window.stageManager.getCurrentStage) {
+        const curStage = window.stageManager.getCurrentStage();
+        if (curStage) {
+          stageWidth = curStage.width || 1400;
+          groundY = curStage.groundY || 480;
+        }
+      }
+
+      for (let s = this.meteorShowers.length - 1; s >= 0; s--) {
+        const shower = this.meteorShowers[s];
+        shower.timer--;
+
+        shower.spawnCooldown = (shower.spawnCooldown || 0) - 1;
+        if (shower.spawnCooldown <= 0) {
+          shower.spawnCooldown = 8 + Math.floor(Math.random() * 5); // drops every 8-12 frames
+
+          // 5 distinct zones spanning the ENTIRE stage width (from 70 to stageWidth - 70)
+          // Zone 0: Far Left (70-320)
+          // Zone 1: Mid Left (320-580)
+          // Zone 2: Center (580-820)
+          // Zone 3: Mid Right (820-1080)
+          // Zone 4: Far Right (1080-1330)
+          const zoneWidth = (stageWidth - 140) / 5;
+          const getZoneTarget = (zoneIdx) => {
+            const zMin = 70 + zoneIdx * zoneWidth;
+            return zMin + 15 + Math.random() * (zoneWidth - 30);
+          };
+
+          const spawnOneMeteor = (targetGroundX) => {
+            const spawnY = -80 - Math.random() * 100;
+            const vy = 13.5 + Math.random() * 4.0;
+            const travelFrames = Math.max(1, (groundY - spawnY) / vy);
+            const dir = Math.random() < 0.5 ? 1 : -1;
+            const vx = dir * (2.5 + Math.random() * 4.5);
+            const spawnX = targetGroundX - vx * travelFrames;
+
+            const variant = Math.floor(Math.random() * 4) + 1; // 1 to 4
+            this.projectiles.push({
+              owner: shower.owner,
+              type: 'meteor',
+              variant: variant,
+              x: spawnX,
+              y: spawnY,
+              vx: vx,
+              vy: vy,
+              radius: 32,
+              damage: 20 * (shower.owner ? shower.owner.power : 1),
+              color: '#ea580c',
+              life: Math.ceil(travelFrames) + 12
+            });
+          };
+
+          // Primary meteor: cycles across diverse zones (Far Left, Mid Left, Center, Mid Right, Far Right)
+          shower.zoneIndex = ((shower.zoneIndex || 0) + 1 + (Math.random() < 0.25 ? 1 : 0)) % 5;
+          spawnOneMeteor(getZoneTarget(shower.zoneIndex));
+
+          // Secondary meteor (60% chance): strikes a different, distant zone across the battlefield simultaneously!
+          if (Math.random() < 0.6) {
+            const secondZone = (shower.zoneIndex + 2 + Math.floor(Math.random() * 2)) % 5;
+            spawnOneMeteor(getZoneTarget(secondZone));
+          }
+
+          if (window.soundEngine && Math.random() < 0.45) {
+            window.soundEngine.playWhoosh();
+          }
+        }
+
+        if (shower.timer <= 0) {
+          this.meteorShowers.splice(s, 1);
         }
       }
     }
@@ -582,6 +769,32 @@ class ParticleSystem {
           maxLife: 20,
           type: 'code_char'
         });
+      }
+
+      // Fiery tail and smoke trail for falling meteors
+      if (proj.type === 'meteor' && Math.random() < 0.8) {
+        this.particles.push({
+          type: 'spark',
+          x: proj.x + (Math.random() - 0.5) * 16 - proj.vx * 0.35,
+          y: proj.y + (Math.random() - 0.5) * 16 - proj.vy * 0.35,
+          vx: (Math.random() - 0.5) * 2 - proj.vx * 0.15,
+          vy: -2 - Math.random() * 2.5,
+          color: Math.random() > 0.4 ? '#ea580c' : '#facc15',
+          life: 18,
+          size: 4
+        });
+        if (Math.random() < 0.35) {
+          this.particles.push({
+            type: 'smoke',
+            x: proj.x - proj.vx * 0.5,
+            y: proj.y - proj.vy * 0.5,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: -1 - Math.random() * 2,
+            color: 'rgba(35, 25, 25, 0.7)',
+            life: 25,
+            size: 14
+          });
+        }
       }
 
       // Cosmic astral trail for Unicão's Astral Blast
@@ -723,6 +936,20 @@ class ParticleSystem {
               const bTexts = ['PEW!', 'IA STRIKE', 'TARGET LOCK', '99.9%', 'CRIT'];
               this.addText(proj.x, proj.y - 22, bTexts[Math.floor(Math.random() * bTexts.length)], '#f97316', 15);
             }
+          } else if (proj.type === 'meteor') {
+            this.shake(10);
+            this.createFlameBurst(proj.x, proj.y, 22, '#ea580c');
+            this.addText(proj.x, proj.y - 25, "💥 METEORO!", "#ea580c", 20);
+            if (window.soundEngine && Math.random() < 0.5) {
+              window.soundEngine.playHitHeavy();
+            }
+          } else if (proj.type === 'dragon_fire') {
+            this.shake(12);
+            this.createFlameBurst(proj.x, proj.y, 24, '#ea580c');
+            this.addText(proj.x, proj.y - 25, "🔥 INFERNO!", "#ef4444", 20);
+            if (window.soundEngine && Math.random() < 0.5) {
+              window.soundEngine.playHitHeavy();
+            }
           }
 
           this.projectiles.splice(i, 1);
@@ -731,12 +958,25 @@ class ParticleSystem {
       }
 
       // Ground or out of bounds
-      if (proj.x < -100 || proj.x > 1500 || proj.y > 515 || proj.life <= 0) {
+      let stageFloorY = 480;
+      let stageMaxW = 1400;
+      if (window.stageManager && window.stageManager.getCurrentStage) {
+        const cs = window.stageManager.getCurrentStage();
+        if (cs) {
+          stageFloorY = cs.groundY || 480;
+          stageMaxW = cs.width || 1400;
+        }
+      }
+
+      if (proj.x < -200 || proj.x > stageMaxW + 200 || proj.y >= stageFloorY - 5 || proj.life <= 0) {
         if (proj.type === 'meteor') {
-          this.createFlameBurst(proj.x, 480, 20, '#ea580c');
+          this.createFlameBurst(proj.x, stageFloorY, 22, '#ea580c');
           this.shake(8);
+          if (window.soundEngine && Math.random() < 0.3) {
+            window.soundEngine.playHitLight();
+          }
         } else if (proj.type === 'bot_laser') {
-          this.createHitspark(proj.x, Math.min(proj.y, 510), false, '#f97316');
+          this.createHitspark(proj.x, Math.min(proj.y, stageFloorY), false, '#f97316');
         }
         this.projectiles.splice(i, 1);
       }
@@ -811,13 +1051,41 @@ class ParticleSystem {
         ctx.lineTo(-p.radius, 8);
         ctx.closePath();
         ctx.fill();
-      } else if (p.type === 'dragon_fire' || p.type === 'meteor') {
-        // Dragon Fireball / Meteor
-        const grad = ctx.createRadialGradient(0, 0, 4, 0, 0, p.radius);
+      } else if (p.type === 'meteor') {
+        // Vulcanus Meteor Sprite (4 variants)
+        const img = this.meteorImgs && this.meteorImgs[(p.variant || 1) - 1];
+        const isFlipped = p.vx > 0;
+
+        ctx.save();
+        if (isFlipped) ctx.scale(-1, 1);
+
+        if (img && img.complete && img.naturalWidth) {
+          ctx.shadowColor = '#ea580c';
+          ctx.shadowBlur = 20;
+          const drawW = 86;
+          const drawH = 108;
+          ctx.drawImage(img, -drawW * 0.28, -drawH * 0.72, drawW, drawH);
+        } else {
+          const grad = ctx.createRadialGradient(0, 0, 4, 0, 0, p.radius);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.3, '#fde047');
+          grad.addColorStop(0.7, '#ea580c');
+          grad.addColorStop(1, '#7f1d1d');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      } else if (p.type === 'dragon_fire') {
+        // Dragon Blazing Magma Fireball
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 24;
+        const grad = ctx.createRadialGradient(0, 0, 6, 0, 0, p.radius);
         grad.addColorStop(0, '#ffffff');
-        grad.addColorStop(0.3, '#fde047');
-        grad.addColorStop(0.7, '#ea580c');
-        grad.addColorStop(1, '#7f1d1d');
+        grad.addColorStop(0.25, '#fde047');
+        grad.addColorStop(0.65, '#ea580c');
+        grad.addColorStop(1, 'rgba(127, 29, 29, 0.2)');
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
@@ -828,6 +1096,63 @@ class ParticleSystem {
         ctx.beginPath();
         ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
         ctx.fill();
+      } else if (p.type === 'mud_splash') {
+        // Alligator Brutus Emerald Tidal Splash / Onda do Pântano
+        ctx.shadowColor = '#22c55e';
+        ctx.shadowBlur = 20;
+        const grad = ctx.createRadialGradient(0, 0, 4, 0, 0, p.radius);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.3, '#86efac');
+        grad.addColorStop(0.7, '#22c55e');
+        grad.addColorStop(1, 'rgba(21, 128, 61, 0.2)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.radius * 1.25, p.radius * 0.75, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#a7f3d0';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(p.radius * 0.35, 0, p.radius * 0.75, -Math.PI * 0.45, Math.PI * 0.45);
+        ctx.stroke();
+      } else if (p.type === 'ice_spike') {
+        // Bear Ursus Glacial Ice Spike / Espinho Glacial
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 18;
+        const grad = ctx.createLinearGradient(-p.radius, 0, p.radius, 0);
+        grad.addColorStop(0, 'rgba(56, 189, 248, 0.2)');
+        grad.addColorStop(0.5, '#38bdf8');
+        grad.addColorStop(1, '#ffffff');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        // Crystalline jagged shard
+        ctx.moveTo(p.radius * 1.3, 0);
+        ctx.lineTo(-p.radius * 0.8, -p.radius * 0.7);
+        ctx.lineTo(-p.radius * 0.4, 0);
+        ctx.lineTo(-p.radius * 0.8, p.radius * 0.7);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#e0f2fe';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else if (p.type === 'fire_kick_crescent') {
+        // Capybara Mestre Kai Blazing Crescent Wave emerging from kick!
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = 24;
+        const grad = ctx.createRadialGradient(0, 0, 6, 0, 0, p.radius * 1.3);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.35, '#fef08a');
+        grad.addColorStop(0.7, '#f97316');
+        grad.addColorStop(1, 'rgba(234, 88, 12, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        // Crescent wave shape
+        ctx.arc(0, 0, p.radius * 1.25, -Math.PI * 0.45, Math.PI * 0.45, false);
+        ctx.arc(p.radius * 0.55, 0, p.radius * 0.85, Math.PI * 0.45, -Math.PI * 0.45, true);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
       } else if (p.type === 'server_packet') {
         // Emerson Cyber Server Packet
         ctx.fillStyle = '#0891b2';
@@ -1232,11 +1557,18 @@ class ParticleSystem {
       this.bots.forEach(bot => {
         ctx.save();
         ctx.translate(bot.x, bot.y);
+        const scale = bot.scale || 1.0;
+        if (scale !== 1.0) ctx.scale(scale, scale);
+
+        if (bot.isSuper) {
+          ctx.shadowColor = '#ef4444';
+          ctx.shadowBlur = 18;
+        }
 
         // 1. Thruster jet / exhaust flames under the bot's bottom feet
         const flameH = 10 + Math.random() * 14;
         const flameGrad = ctx.createLinearGradient(0, 22, 0, 22 + flameH);
-        flameGrad.addColorStop(0, 'rgba(249, 115, 22, 0.95)');
+        flameGrad.addColorStop(0, bot.isSuper ? 'rgba(239, 68, 68, 0.95)' : 'rgba(249, 115, 22, 0.95)');
         flameGrad.addColorStop(0.5, 'rgba(251, 191, 36, 0.85)');
         flameGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = flameGrad;
@@ -1259,8 +1591,8 @@ class ParticleSystem {
 
         // 2. Targeting laser guide line when in shooting state
         if (bot.state === 'shoot') {
-          ctx.strokeStyle = 'rgba(239, 68, 68, 0.35)';
-          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = bot.isSuper ? 'rgba(239, 68, 68, 0.65)' : 'rgba(239, 68, 68, 0.35)';
+          ctx.lineWidth = bot.isSuper ? 2.5 : 1.5;
           ctx.setLineDash([6, 6]);
           ctx.beginPath();
           ctx.moveTo(0, 24);
@@ -1332,6 +1664,14 @@ class ParticleSystem {
         ctx.shadowColor = p.color;
         ctx.shadowBlur = 6;
         ctx.fillText(p.charText, p.x, p.y);
+      } else if (p.type === 'music_note') {
+        ctx.fillStyle = p.color;
+        ctx.font = `bold ${p.size || 18}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.fillText(p.noteText || '♪', p.x, p.y);
       } else if (p.type === 'ring') {
         ctx.strokeStyle = p.color;
         ctx.lineWidth = p.lineWidth;
