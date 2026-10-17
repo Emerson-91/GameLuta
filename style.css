@@ -399,7 +399,6 @@ body {
   transition: width 0.05s linear;
 }
 
-/* Super Meter Bar */
 .meter-bar-bg {
   position: relative;
   height: 14px;
@@ -407,6 +406,20 @@ body {
   border: 1px solid #334155;
   border-radius: 3px;
   overflow: hidden;
+}
+
+/* Divisória central aos 50% (marca o limiar do Especial) */
+.meter-bar-bg::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  z-index: 3;
+  pointer-events: none;
 }
 
 .meter-bar-fill {
@@ -420,6 +433,12 @@ body {
 
 .p1-hud .meter-bar-fill { left: 0; }
 .p2-hud .meter-bar-fill { right: 0; }
+
+/* Especial Pronto (50% a 99%) */
+.meter-special .meter-bar-fill {
+  background: linear-gradient(90deg, #f97316 0%, #fbbf24 100%);
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.6);
+}
 
 .meter-max .meter-bar-fill {
   background: linear-gradient(90deg, #f59e0b, #ef4444, #fbbf24);
@@ -693,6 +712,13 @@ body {
 .char-card.active-p1.active-p2 {
   border-color: #a855f7;
   box-shadow: 0 0 16px #a855f7, 0 0 8px #ef4444;
+}
+
+.char-card.char-card-boss {
+  grid-column: 3 / span 2;
+  justify-self: center;
+  border-color: #ef4444;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.45);
 }
 
 .char-thumb {
@@ -1086,6 +1112,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#pause-modal {
+  z-index: 60;
+}
+
+#screen-controls {
+  z-index: 100;
 }
 
 .controls-card {

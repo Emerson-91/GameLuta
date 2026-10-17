@@ -42,17 +42,19 @@ class UIManager {
     if (p1Meter) {
       p1Meter.style.width = `${p1MeterPercent}%`;
       if (p1.meter >= 100) {
+        p1Meter.parentElement.classList.remove('meter-special');
         p1Meter.parentElement.classList.add('meter-max');
-        p1MeterText.innerText = '★ SUPER PRONTO ★';
+        p1MeterText.innerText = '★ SUPER PRONTO (100%) ★';
       } else if (p1.meter >= 50) {
         p1Meter.parentElement.classList.remove('meter-max');
+        p1Meter.parentElement.classList.add('meter-special');
         p1MeterText.innerText = `⚡ ESPECIAL PRONTO (${Math.floor(p1.meter)}%)`;
       } else if (p1.meterRechargeDelay > 0) {
-        p1Meter.parentElement.classList.remove('meter-max');
-        p1MeterText.innerText = 'ESPECIAL: AGUARDE...';
+        p1Meter.parentElement.classList.remove('meter-max', 'meter-special');
+        p1MeterText.innerText = 'ESPECIAL: AGUARDE 1s...';
       } else {
-        p1Meter.parentElement.classList.remove('meter-max');
-        p1MeterText.innerText = `ESPECIAL: ${Math.floor(p1.meter * 2)}%`;
+        p1Meter.parentElement.classList.remove('meter-max', 'meter-special');
+        p1MeterText.innerText = `ESPECIAL: ${Math.floor(p1.meter)}/50%`;
       }
     }
 
@@ -76,17 +78,19 @@ class UIManager {
     if (p2Meter) {
       p2Meter.style.width = `${p2MeterPercent}%`;
       if (p2.meter >= 100) {
+        p2Meter.parentElement.classList.remove('meter-special');
         p2Meter.parentElement.classList.add('meter-max');
-        p2MeterText.innerText = '★ SUPER PRONTO ★';
+        p2MeterText.innerText = '★ SUPER PRONTO (100%) ★';
       } else if (p2.meter >= 50) {
         p2Meter.parentElement.classList.remove('meter-max');
+        p2Meter.parentElement.classList.add('meter-special');
         p2MeterText.innerText = `⚡ ESPECIAL PRONTO (${Math.floor(p2.meter)}%)`;
       } else if (p2.meterRechargeDelay > 0) {
-        p2Meter.parentElement.classList.remove('meter-max');
-        p2MeterText.innerText = 'ESPECIAL: AGUARDE...';
+        p2Meter.parentElement.classList.remove('meter-max', 'meter-special');
+        p2MeterText.innerText = 'ESPECIAL: AGUARDE 1s...';
       } else {
-        p2Meter.parentElement.classList.remove('meter-max');
-        p2MeterText.innerText = `ESPECIAL: ${Math.floor(p2.meter * 2)}%`;
+        p2Meter.parentElement.classList.remove('meter-max', 'meter-special');
+        p2MeterText.innerText = `ESPECIAL: ${Math.floor(p2.meter)}/50%`;
       }
     }
 

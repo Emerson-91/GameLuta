@@ -27,6 +27,10 @@ class GameEngine {
     this.arcadeLadder = ['alligator', 'capybara', 'owl', 'wolf', 'gorilla', 'tiger', 'bear', 'cat', 'dragon'];
     this.arcadeIndex = 0;
 
+    // Secret Boss Unlock State (typing 'boss' unlocks Vulcanus)
+    this.bossUnlocked = false;
+    this.secretCodeBuffer = '';
+
     // Camera & Viewport
     this.cameraX = 0;
     this.targetCameraX = 0;
@@ -41,6 +45,9 @@ class GameEngine {
     // Continue Screen Timer
     this.continueTimer = 10;
     this.continueInterval = null;
+
+    // Controls Modal opened from Pause tracker
+    this.openedControlsFromPause = false;
 
     // Input Tracking
     this.keys = {};
@@ -77,6 +84,18 @@ class GameEngine {
       // Unmute audio context on first user gesture
       if (window.soundEngine && !window.soundEngine.ctx) {
         window.soundEngine.init();
+      }
+
+      // Secret Cheat Code detection (typing "boss" unlocks Vulcanus)
+      if (e.key && e.key.length === 1) {
+        this.secretCodeBuffer = (this.secretCodeBuffer || '') + e.key.toLowerCase();
+        if (this.secretCodeBuffer.length > 20) {
+          this.secretCodeBuffer = this.secretCodeBuffer.slice(-20);
+        }
+        if (this.secretCodeBuffer.endsWith('boss')) {
+          this.unlockBoss();
+          return;
+        }
       }
 
       // Keyboard navigation on Character Select screen
@@ -166,10 +185,26 @@ class GameEngine {
   }
 
   togglePause() {
-    this.isPaused = !this.isPaused;
+    if (this.state !== 'FIGHT') return;
+
+    const controlsModal = document.getElementById('screen-controls');
     const pauseMenu = document.getElementById('pause-modal');
+
+    // If controls modal was open and user toggles pause, close controls and restore pause safely!
+    if (controlsModal && !controlsModal.classList.contains('hidden')) {
+      controlsModal.classList.add('hidden');
+      this.openedControlsFromPause = false;
+      this.isPaused = true;
+      if (pauseMenu) pauseMenu.classList.remove('hidden');
+      return;
+    }
+
+    this.isPaused = !this.isPaused;
     if (pauseMenu) {
       pauseMenu.classList.toggle('hidden', !this.isPaused);
+    }
+    if (this.isPaused) {
+      this.resetKeys();
     }
   }
 
@@ -309,18 +344,41 @@ class GameEngine {
     if (cardP2) cardP2.style.borderColor = player === 'p2' ? '#3b82f6' : '#475569';
   }
 
+  // Get currently active playable roster (Vulcanus only appears if unlocked)
+  getRoster() {
+    return PLAYABLE_ROSTER.filter(id => id !== 'dragon' || this.bossUnlocked);
+  }
+
+  // Secret boss unlock triggered by typing 'boss'
+  unlockBoss() {
+    if (this.bossUnlocked) return;
+    this.bossUnlocked = true;
+
+    if (window.soundEngine) {
+      window.soundEngine.playSuper();
+    }
+    if (window.particleSystem) {
+      window.particleSystem.shake(16);
+    }
+
+    if (this.state === 'SELECT') {
+      this.renderCharacterGrid();
+      this.selectFighter(this.activePicker || 'p1', 'dragon', true);
+    }
+  }
+
   renderCharacterGrid() {
     const grid = document.getElementById('char-grid');
     if (!grid) return;
     grid.innerHTML = '';
 
-    PLAYABLE_ROSTER.forEach(charId => {
+    this.getRoster().forEach(charId => {
       const char = CHARACTERS[charId];
       const isP1 = this.selectedP1Char === charId;
       const isP2 = this.isVersusSelect && this.selectedP2Char === charId;
 
       const card = document.createElement('div');
-      card.className = `char-card ${isP1 ? 'active-p1' : ''} ${isP2 ? 'active-p2' : ''}`;
+      card.className = `char-card ${charId === 'dragon' ? 'char-card-boss' : ''} ${isP1 ? 'active-p1' : ''} ${isP2 ? 'active-p2' : ''}`;
       card.title = `${char.name} - ${char.title}`;
 
       let badgesHtml = '';
@@ -483,7 +541,7 @@ class GameEngine {
     if (!targetPlayer || (dx === 0 && dy === 0)) return;
 
     const currentChar = targetPlayer === 'p1' ? this.selectedP1Char : this.selectedP2Char;
-    const roster = PLAYABLE_ROSTER;
+    const roster = this.getRoster();
     let currentIndex = roster.indexOf(currentChar);
     if (currentIndex === -1) currentIndex = 0;
 
@@ -496,7 +554,9 @@ class GameEngine {
     } else if (dy !== 0) {
       // Vertical movement between rows
       if (dy < 0) { // Up
-        if (currentIndex >= COLS) {
+        if (currentIndex === 12) {
+          newIndex = 8; // Jump up to center of row 2 from Vulcanus
+        } else if (currentIndex >= COLS) {
           newIndex = currentIndex - COLS;
         } else {
           newIndex = Math.min(currentIndex + COLS, roster.length - 1);
@@ -504,8 +564,10 @@ class GameEngine {
       } else if (dy > 0) { // Down
         if (currentIndex < COLS) {
           newIndex = Math.min(currentIndex + COLS, roster.length - 1);
+        } else if (currentIndex < 12 && roster.length > 12) {
+          newIndex = 12; // Jump down to Vulcanus from row 2
         } else {
-          newIndex = currentIndex - COLS;
+          newIndex = currentIndex % COLS;
         }
       }
     }
@@ -1103,11 +1165,32 @@ class GameEngine {
   }
 
   openControlsModal() {
-    document.getElementById('screen-controls').classList.remove('hidden');
+    const controlsModal = document.getElementById('screen-controls');
+    if (!controlsModal) return;
+
+    if (this.state === 'FIGHT' || this.isPaused) {
+      this.openedControlsFromPause = true;
+      this.isPaused = true;
+      const pauseModal = document.getElementById('pause-modal');
+      if (pauseModal) pauseModal.classList.add('hidden');
+    }
+
+    controlsModal.classList.remove('hidden');
   }
 
   closeControlsModal() {
-    document.getElementById('screen-controls').classList.add('hidden');
+    const controlsModal = document.getElementById('screen-controls');
+    if (controlsModal) controlsModal.classList.add('hidden');
+
+    // If opened from pause, safely return to pause modal without unpausing fight!
+    if (this.openedControlsFromPause) {
+      this.openedControlsFromPause = false;
+      const pauseModal = document.getElementById('pause-modal');
+      if (pauseModal && this.state === 'FIGHT') {
+        pauseModal.classList.remove('hidden');
+        this.isPaused = true;
+      }
+    }
   }
 
   // --- Render & Game Loop ---

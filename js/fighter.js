@@ -15,9 +15,9 @@ class Fighter {
     this.maxHp = data.baseHp;
     this.hp = this.maxHp;
     this.maxMeter = 100;
-    this.meter = 100; // Inicia cheio para o especial poder ser usado!
+    this.meter = (window.gameEngine && window.gameEngine.mode === 'training') ? 100 : 0; // Inicia em 0 na luta para carregar durante o combate
     this.meterRechargeDelay = 0; // Espera de 1 segundo após usar especial
-    this.isSuperCharged = true;
+    this.isSuperCharged = false;
 
     this.speed = data.speed;
     this.power = data.power;
@@ -585,7 +585,8 @@ class Fighter {
       this.blockStunTimer = isHeavy ? 14 : 8;
       this.state = 'BLOCK';
       this.vx = -4 * this.facing;
-      this.addMeter(6);
+      this.addMeter(2);
+      if (attacker) attacker.addMeter(3);
 
       window.soundEngine.playBlock();
       window.particleSystem.createBlockSpark(this.x, this.y - this.height * 0.6);
@@ -598,8 +599,13 @@ class Fighter {
     this.hp -= effectiveDamage;
     this.hitStunTimer = isHeavy ? 24 : 15;
     this.hitFlashTimer = 6;
-    this.addMeter(12);
-    if (attacker) attacker.addMeter(18);
+    this.addMeter(isHeavy ? 5 : 4);
+    if (attacker) {
+      // Requisito: A cada dois socos ou dois chutes aumente 15% a 20%:
+      // 1 Soco (light): +8.5% (2 socos = 17%, no intervalo de 15% a 20%)
+      // 1 Chute (heavy): +10.0% (2 chutes = 20%)
+      attacker.addMeter(isHeavy ? 10.0 : 8.5);
+    }
 
     // Sound and Sparks
     if (isHeavy) {
@@ -674,8 +680,8 @@ class Fighter {
       this.meterRechargeDelay--;
       // Permanece em 0 durante o 1 segundo de espera
     } else if (this.meter < this.maxMeter && !this.isDead) {
-      // Passado 1 segundo, começa a encher novamente!
-      const regenRate = (window.gameEngine && window.gameEngine.mode === 'training') ? 0.60 : 0.42;
+      // Mais demorado para carregar: regeneração passiva mínima para valorizar a luta ativa
+      const regenRate = (window.gameEngine && window.gameEngine.mode === 'training') ? 0.50 : 0.03;
       this.addMeter(regenRate);
     }
 
