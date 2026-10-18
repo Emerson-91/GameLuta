@@ -979,10 +979,27 @@ class Fighter {
         this.attackPhase = 'startup';
       } else if (this.stateTimer <= 11) {
         this.attackPhase = 'active';
+        if (this.charId === 'dragon' && (this.isFlying || !this.isGrounded) && this.stateTimer === 5) {
+          if (window.particleSystem) {
+            for (let i = 0; i < 8; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + this.facing * 75,
+                y: this.y - this.height * 0.45,
+                vx: this.facing * (2.5 + Math.random() * 4),
+                vy: (Math.random() - 0.5) * 3,
+                color: Math.random() > 0.5 ? '#f97316' : '#ef4444',
+                life: 14,
+                maxLife: 14,
+                size: 3.5,
+                type: 'spark'
+              });
+            }
+          }
+        }
       } else if (this.stateTimer <= 18) {
         this.attackPhase = 'recovery';
       } else {
-        this.state = this.isCrouchAttacking ? 'CROUCH' : (this.isGrounded ? 'IDLE' : 'JUMP');
+        this.state = this.isCrouchAttacking ? 'CROUCH' : (this.isFlying ? 'IDLE' : (this.isGrounded ? 'IDLE' : 'JUMP'));
         this.isCrouchAttacking = false;
         this.attackPhase = '';
       }
@@ -991,10 +1008,28 @@ class Fighter {
         this.attackPhase = 'startup';
       } else if (this.stateTimer <= 16) {
         this.attackPhase = 'active';
+        if (this.charId === 'dragon' && (this.isFlying || !this.isGrounded) && this.stateTimer === 8) {
+          if (window.particleSystem) {
+            window.particleSystem.shake(4);
+            for (let i = 0; i < 12; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + this.facing * 85,
+                y: this.y - this.height * 0.25,
+                vx: this.facing * (3 + Math.random() * 5),
+                vy: (Math.random() - 0.5) * 4,
+                color: Math.random() > 0.4 ? '#f59e0b' : '#ef4444',
+                life: 16,
+                maxLife: 16,
+                size: 4,
+                type: 'spark'
+              });
+            }
+          }
+        }
       } else if (this.stateTimer <= 27) {
         this.attackPhase = 'recovery';
       } else {
-        this.state = this.isCrouchAttacking ? 'CROUCH' : (this.isGrounded ? 'IDLE' : 'JUMP');
+        this.state = this.isCrouchAttacking ? 'CROUCH' : (this.isFlying ? 'IDLE' : (this.isGrounded ? 'IDLE' : 'JUMP'));
         this.isCrouchAttacking = false;
         this.attackPhase = '';
       }
@@ -1064,6 +1099,71 @@ class Fighter {
       }
     } else if (this.state === 'VICTORY') {
       this.vx = 0;
+      if (this.isFlying) {
+        if (this.y < stage.groundY) {
+          this.y = Math.min(stage.groundY, this.y + 5);
+        }
+        if (this.y >= stage.groundY) {
+          this.y = stage.groundY;
+          this.isFlying = false;
+          this.isGrounded = true;
+        }
+      }
+      if (this.charId === 'dragon') {
+        if (this.stateTimer === 1) {
+          if (window.soundEngine) window.soundEngine.playSpecial();
+        } else if (this.stateTimer === 72) {
+          if (window.particleSystem) {
+            window.particleSystem.shake(10);
+            for (let i = 0; i < 18; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 80,
+                y: this.y - Math.random() * 120,
+                vx: (Math.random() - 0.5) * 4,
+                vy: -3 - Math.random() * 4,
+                color: Math.random() > 0.5 ? '#f59e0b' : '#ef4444',
+                life: 25,
+                maxLife: 25,
+                size: 4,
+                type: 'spark'
+              });
+            }
+          }
+        } else if (this.stateTimer === 126) {
+          if (window.soundEngine) window.soundEngine.playSuperActivate();
+          if (window.particleSystem) {
+            window.particleSystem.shake(18);
+            window.particleSystem.addText(this.x, this.y - this.height - 35, "★ O CATACLISMO DE VULCANUS! ★", "#ef4444", 28);
+            for (let i = 0; i < 35; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + (Math.random() - 0.5) * 100,
+                y: this.y - Math.random() * 150,
+                vx: (Math.random() - 0.5) * 6,
+                vy: -4 - Math.random() * 6,
+                color: Math.random() > 0.4 ? '#ef4444' : (Math.random() > 0.5 ? '#f59e0b' : '#fde047'),
+                life: 30,
+                maxLife: 30,
+                size: 5,
+                type: 'spark'
+              });
+            }
+          }
+        }
+
+        if (this.stateTimer >= 126 && this.animTimer % 4 === 0 && window.particleSystem) {
+          window.particleSystem.particles.push({
+            x: this.x + (Math.random() - 0.5) * 90,
+            y: this.y - 20 - Math.random() * 100,
+            vx: (Math.random() - 0.5) * 2.5,
+            vy: -2 - Math.random() * 3,
+            color: Math.random() > 0.5 ? '#ef4444' : '#f59e0b',
+            life: 22,
+            maxLife: 22,
+            size: 4,
+            type: 'spark'
+          });
+        }
+      }
       if (this.charId === 'emerson') {
         if (this.stateTimer === 62) {
           // Surge of blue electric aura
