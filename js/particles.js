@@ -144,6 +144,29 @@ class ParticleSystem {
     });
   }
 
+  // Ground Impact Shockwave Ring (Used by Kongo, ground smashes)
+  createImpactRing(x, y, color = '#f59e0b', isHeavy = true) {
+    this.particles.push({
+      x,
+      y,
+      vx: 0,
+      vy: 0,
+      radius: 6,
+      maxRadius: isHeavy ? 60 : 35,
+      color: color,
+      lineWidth: isHeavy ? 4 : 2,
+      life: 14,
+      maxLife: 14,
+      type: 'ring'
+    });
+  }
+
+  // Check if a fighter currently has active AI bots/drones flying
+  hasActiveBots(owner) {
+    if (!this.bots || this.bots.length === 0) return false;
+    return this.bots.some(b => b.owner === owner);
+  }
+
   // Fire / Chi Puff
   createFlameBurst(x, y, count = 15, color = '#ef4444') {
     for (let i = 0; i < count; i++) {
@@ -835,8 +858,8 @@ class ParticleSystem {
         const dist = Math.hypot(dx, dy);
 
         if (dist < proj.radius + target.width * 0.45) {
-          // Hit target!
-          target.receiveHit(proj.damage, false, proj.owner);
+          // Hit target! (flag as projectile hit)
+          target.receiveHit(proj.damage, false, proj.owner, true);
           this.createHitspark(proj.x, proj.y, true, proj.color);
 
           if (proj.type === 'code_hadouken') {
@@ -949,6 +972,24 @@ class ParticleSystem {
             this.addText(proj.x, proj.y - 25, "🔥 INFERNO!", "#ef4444", 20);
             if (window.soundEngine && Math.random() < 0.5) {
               window.soundEngine.playHitHeavy();
+            }
+          } else if (proj.type === 'boulder') {
+            this.shake(15);
+            this.addText(proj.x, proj.y - 30, "💥 ROCHA ESMAGADORA!", "#eab308", 22);
+            this.createHitspark(proj.x, proj.y, true, '#eab308');
+            if (window.soundEngine) window.soundEngine.playHitHeavy();
+            for (let k = 0; k < 15; k++) {
+              this.particles.push({
+                x: proj.x,
+                y: proj.y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: -Math.random() * 6 - 2,
+                color: Math.random() > 0.5 ? '#78350f' : (Math.random() > 0.5 ? '#a1a1aa' : '#52525b'),
+                size: Math.random() * 4 + 3,
+                life: 25,
+                maxLife: 25,
+                type: 'spark'
+              });
             }
           }
 
@@ -1091,11 +1132,42 @@ class ParticleSystem {
         ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
         ctx.fill();
       } else if (p.type === 'boulder') {
-        // Gorilla stone
+        // Gorilla Kongo's Titanic Boulder with rocky jagged shape & rotation
+        ctx.shadowColor = '#eab308';
+        ctx.shadowBlur = 12;
+        const spin = (90 - p.life) * 0.12 * Math.sign(p.vx || 1);
+        ctx.rotate(spin);
+
+        // Rocky jagged silhouette
         ctx.fillStyle = '#52525b';
         ctx.beginPath();
-        ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
+        const numSides = 7;
+        for (let s = 0; s < numSides; s++) {
+          const ang = (s / numSides) * Math.PI * 2;
+          const rad = p.radius * (0.85 + ((s * 3) % 4) * 0.08);
+          const px = Math.cos(ang) * rad;
+          const py = Math.sin(ang) * rad;
+          if (s === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
         ctx.fill();
+
+        // Dark shading crater
+        ctx.fillStyle = '#3f3f46';
+        ctx.beginPath();
+        ctx.arc(-p.radius * 0.25, p.radius * 0.25, p.radius * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Highlight crest
+        ctx.fillStyle = '#71717a';
+        ctx.beginPath();
+        ctx.arc(p.radius * 0.2, -p.radius * 0.25, p.radius * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#27272a';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
       } else if (p.type === 'mud_splash') {
         // Alligator Brutus Emerald Tidal Splash / Onda do Pântano
         ctx.shadowColor = '#22c55e';

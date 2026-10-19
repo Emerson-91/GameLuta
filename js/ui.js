@@ -49,9 +49,12 @@ class UIManager {
         p1Meter.parentElement.classList.remove('meter-max');
         p1Meter.parentElement.classList.add('meter-special');
         p1MeterText.innerText = `ESPECIAL PRONTO (${Math.floor(p1.meter)}%)`;
+      } else if (p1.charId === 'andrey' && window.particleSystem && window.particleSystem.hasActiveBots && window.particleSystem.hasActiveBots(p1)) {
+        p1Meter.parentElement.classList.remove('meter-max', 'meter-special');
+        p1MeterText.innerText = 'DRONES IA ATIVOS...';
       } else if (p1.meterRechargeDelay > 0) {
         p1Meter.parentElement.classList.remove('meter-max', 'meter-special');
-        p1MeterText.innerText = 'ESPECIAL: AGUARDE 1s...';
+        p1MeterText.innerText = 'ESPECIAL: AGUARDE...';
       } else {
         p1Meter.parentElement.classList.remove('meter-max', 'meter-special');
         p1MeterText.innerText = `ESPECIAL: ${Math.floor(p1.meter)}/50%`;
@@ -85,9 +88,12 @@ class UIManager {
         p2Meter.parentElement.classList.remove('meter-max');
         p2Meter.parentElement.classList.add('meter-special');
         p2MeterText.innerText = `ESPECIAL PRONTO (${Math.floor(p2.meter)}%)`;
+      } else if (p2.charId === 'andrey' && window.particleSystem && window.particleSystem.hasActiveBots && window.particleSystem.hasActiveBots(p2)) {
+        p2Meter.parentElement.classList.remove('meter-max', 'meter-special');
+        p2MeterText.innerText = 'DRONES IA ATIVOS...';
       } else if (p2.meterRechargeDelay > 0) {
         p2Meter.parentElement.classList.remove('meter-max', 'meter-special');
-        p2MeterText.innerText = 'ESPECIAL: AGUARDE 1s...';
+        p2MeterText.innerText = 'ESPECIAL: AGUARDE...';
       } else {
         p2Meter.parentElement.classList.remove('meter-max', 'meter-special');
         p2MeterText.innerText = `ESPECIAL: ${Math.floor(p2.meter)}/50%`;
