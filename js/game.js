@@ -617,6 +617,7 @@ class GameEngine {
     const statusText = document.getElementById('preloader-status-text');
     const resText = document.getElementById('preloader-res-name');
     const startBtn = document.getElementById('btn-start-game');
+    const skipBtn = document.getElementById('btn-skip-video');
 
     const onAssetLoaded = (src) => {
       loaded++;
@@ -633,6 +634,7 @@ class GameEngine {
         if (resText) resText.innerText = `${total} imagens e sprites carregados no cache`;
         if (fill) fill.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
         if (startBtn) startBtn.classList.remove('hidden');
+        if (skipBtn) skipBtn.classList.remove('hidden');
       }
     };
 
@@ -646,6 +648,7 @@ class GameEngine {
   }
 
   finishPreloading() {
+    if (!this.isPreloaded) return;
     const preloader = document.getElementById('screen-preloader');
     if (!preloader || preloader.classList.contains('preloader-hidden')) return;
 
@@ -671,9 +674,11 @@ class GameEngine {
     const preloader = document.getElementById('screen-preloader');
     const video = document.getElementById('preloader-video');
     const startBtn = document.getElementById('btn-start-game');
+    const skipBtn = document.getElementById('btn-skip-video');
     if (preloader && video) {
       preloader.classList.remove('preloader-hidden', 'preloader-fade-out');
-      if (startBtn) startBtn.classList.remove('hidden');
+      if (startBtn && this.isPreloaded) startBtn.classList.remove('hidden');
+      if (skipBtn && this.isPreloaded) skipBtn.classList.remove('hidden');
       video.currentTime = 0;
       video.play().catch(() => {});
     }
@@ -1290,6 +1295,8 @@ class GameEngine {
     this.resetKeys();
     this.hideAllScreens();
     document.getElementById('hud').classList.remove('hidden');
+    const fsGlobal = document.getElementById('btn-fullscreen-global');
+    if (fsGlobal) fsGlobal.classList.add('hidden');
 
     if (this.roundStartTimeout) {
       clearTimeout(this.roundStartTimeout);
@@ -1775,6 +1782,10 @@ class GameEngine {
     if (vpad) {
       vpad.classList.toggle('hidden', !this.mobileControlsVisible);
     }
+    const fsGlobal = document.getElementById('btn-fullscreen-global');
+    if (fsGlobal) {
+      fsGlobal.classList.remove('hidden');
+    }
   }
 
   returnToTitle() {
@@ -1856,7 +1867,7 @@ class GameEngine {
     // 3. Preloader / Character Intro Overlay (if visible)
     const preloader = document.getElementById('screen-preloader');
     if (preloader && !preloader.classList.contains('preloader-hidden')) {
-      if (isConfirm || isBack || isW || isS || isA || isD) {
+      if (this.isPreloaded && (isConfirm || isBack || isW || isS || isA || isD)) {
         e.preventDefault();
         this.finishPreloading();
       }

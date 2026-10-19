@@ -121,7 +121,7 @@
           <div class="preloader-badge">SUPER FIGHTERS COMBAT • APRESENTAÇÃO DOS LUTADORES</div>
           <div class="preloader-top-actions">
             <button class="btn-skip-preloader" onclick="window.gameEngine.toggleFullscreen()">TELA CHEIA</button>
-            <button id="btn-skip-video" class="btn-skip-preloader" onclick="window.gameEngine.finishPreloading()">
+            <button id="btn-skip-video" class="btn-skip-preloader hidden" onclick="window.gameEngine.finishPreloading()">
               PULAR VÍDEO
             </button>
           </div>
@@ -640,6 +640,9 @@
         </button>
         <button class="cmd-key-btn btn-aux" onclick="window.gameEngine.openControlsModal()" title="Ver tabela completa de golpes">
           <span class="cmd-action-name">GOLPES</span>
+        </button>
+        <button class="cmd-key-btn btn-aux btn-fullscreen-highlight" onclick="window.gameEngine.toggleFullscreen()" title="Alternar Tela Cheia">
+          <span class="cmd-action-name">TELA CHEIA</span>
         </button>
       </div>
     </div>

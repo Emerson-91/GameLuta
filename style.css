@@ -1708,6 +1708,7 @@ body {
   cursor: pointer;
   transition: all 0.15s;
   user-select: none;
+  pointer-events: auto;
 }
 
 .hud-touch-pause {
@@ -2299,6 +2300,12 @@ body {
   color: #0f172a;
   box-shadow: 0 0 20px rgba(245, 158, 11, 0.9);
   transform: scale(1.05);
+}
+
+/* Ocultar o botão flutuante universal durante a luta para não ficar sobreposto ao nome do adversário (P2) */
+#game-container:has(#hud:not(.hidden)) #btn-fullscreen-global,
+#hud:not(.hidden) ~ #btn-fullscreen-global {
+  display: none !important;
 }
 
 .btn-fullscreen-highlight {
