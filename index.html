@@ -462,21 +462,45 @@
       <!-- VICTORY ENDING EPILOGUE (DEFEATING DRAGON BOSS) -->
       <div id="screen-ending" class="menu-screen hidden ending-bg">
         <div class="ending-container">
-          <div class="ending-badge">CAMPEÃO MUNDIAL DE SUPER FIGHTERS COMBAT</div>
+          <div class="ending-badge">★ TORNEIO SUPREMO ZERADO - CAMPEÃO MUNDIAL ★</div>
           <div class="ending-hero-display">
-            <div class="ending-frame">
-              <img id="ending-hero-img" src="assets/images/portrait_dog.jpg" alt="Campeão">
+            <!-- Palco com Animação Viva do Personagem -->
+            <div class="ending-stage-wrapper">
+              <div class="ending-spotlight"></div>
+              <canvas id="ending-character-canvas" width="280" height="340" class="ending-character-canvas"></canvas>
+              <div class="ending-pedestal-base"></div>
+              <div id="ending-hero-subtitle" class="ending-hero-subtitle">MESTRE DAS ARENAS</div>
             </div>
+
+            <!-- História Final e Conquistas do Personagem -->
             <div class="ending-text-box">
-              <h2 id="ending-hero-title" class="ending-hero-title">CAMPEÃO SUPREMO!</h2>
-              <div id="ending-story-text" class="ending-story-text">
+              <div class="ending-header-row">
+                <div class="ending-portrait-mini">
+                  <img id="ending-hero-img" src="assets/images/portrait_dog.jpg" alt="Campeão">
+                </div>
+                <div class="ending-titles">
+                  <h2 id="ending-hero-title" class="ending-hero-title">CAMPEÃO SUPREMO!</h2>
+                  <div id="ending-hero-epithet" class="ending-hero-epithet">A LENDA VIVA DE SUPER FIGHTERS</div>
+                </div>
+              </div>
+
+              <div id="ending-story-text" class="ending-story-text custom-scrollbar">
                 História final de vitória épica!
+              </div>
+
+              <div id="ending-quote-box" class="ending-quote-box">
+                <span class="ending-quote-mark">“</span>
+                <span id="ending-quote-text" class="ending-quote-text">A vitória pertence àqueles que nunca desistem!</span>
+                <span class="ending-quote-mark">”</span>
               </div>
             </div>
           </div>
-          <button class="arcade-btn btn-primary" onclick="window.gameEngine.returnToTitle()">
-            FINALIZAR E VOLTAR AO MENU
-          </button>
+
+          <div class="ending-actions">
+            <button class="arcade-btn btn-primary" onclick="window.gameEngine.returnToTitle()">
+              FINALIZAR E VOLTAR AO MENU PRINCIPAL
+            </button>
+          </div>
         </div>
       </div>
 

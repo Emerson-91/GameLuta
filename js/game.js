@@ -1681,15 +1681,33 @@ class GameEngine {
       this.updateModalFocus(screen, 0);
     }
 
-    const hero = this.p1.charData;
+    const hero = (this.p1 && this.p1.charData) ? this.p1.charData : CHARACTERS['dog'];
+    const heroId = hero.id || 'dog';
+    const endingData = window.GAME_STORIES && window.GAME_STORIES.championEndings[heroId];
+
+    // Character Portrait
     const img = document.getElementById('ending-hero-img');
     if (img) img.src = hero.portrait;
-    const endingData = window.GAME_STORIES && window.GAME_STORIES.championEndings[hero.id];
+
+    // Pedestal subtitle
+    const subtitle = document.getElementById('ending-hero-subtitle');
+    if (subtitle) {
+      subtitle.innerText = hero.title ? hero.title.toUpperCase() : 'MESTRE DAS ARENAS';
+    }
+
+    // Main Champion Title
     const title = document.getElementById('ending-hero-title');
     if (title) {
       title.innerText = (endingData && endingData.title) ? endingData.title : `CAMPEÃO SUPREMO: ${hero.name.toUpperCase()}!`;
     }
 
+    // Hero Epithet
+    const epithet = document.getElementById('ending-hero-epithet');
+    if (epithet) {
+      epithet.innerText = (endingData && endingData.epithet) ? endingData.epithet : 'A LENDA VIVA DE SUPER FIGHTERS';
+    }
+
+    // Epic Multi-paragraph Story
     const storyElem = document.getElementById('ending-story-text');
     if (storyElem) {
       if (endingData && endingData.text) {
@@ -1701,8 +1719,147 @@ class GameEngine {
           A paz e a honra foram restauradas e sua lenda ecoará pela eternidade nos anais do <strong>SUPER FIGHTERS COMBAT</strong>!
         `;
       }
+      storyElem.scrollTop = 0;
+    }
+
+    // Legendary Victory Quote
+    const quoteElem = document.getElementById('ending-quote-text');
+    if (quoteElem) {
+      quoteElem.innerText = (endingData && endingData.quote) ? endingData.quote : 'A verdadeira força vem de nunca desistir!';
+    }
+
+    // Start Live Canvas Victory Animation on Pedestal with Confetti
+    this.startEndingAnimation(heroId);
+
+    // Play Grand Orchestral Fanfare / Rock Solo
+    if (window.soundEngine && window.soundEngine.playGrandEndingFanfare) {
+      window.soundEngine.playGrandEndingFanfare(heroId);
+    } else if (window.soundEngine && window.soundEngine.playSuperActivate) {
+      window.soundEngine.playSuperActivate();
     }
   }
+
+  stopEndingAnimation() {
+    if (this.endingAnimFrame) {
+      cancelAnimationFrame(this.endingAnimFrame);
+      this.endingAnimFrame = null;
+    }
+    this.endingFighter = null;
+    this.endingConfetti = null;
+  }
+
+  startEndingAnimation(heroId) {
+    this.stopEndingAnimation();
+    const canvas = document.getElementById('ending-character-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const charData = CHARACTERS[heroId] || (this.p1 ? this.p1.charData : CHARACTERS['dog']);
+    const themeColor = charData.themeColor || '#fbbf24';
+
+    this.endingFighter = {
+      charId: heroId,
+      charData: charData,
+      x: 140,
+      y: 290,
+      facing: 1,
+      state: 'VICTORY',
+      stateTimer: 0,
+      animTimer: 0,
+      isGrounded: true,
+      isFlying: false,
+      vx: 0,
+      vy: 0,
+      hitFlashTimer: 0,
+      invulnerableTimer: 0,
+      isP2: false,
+      attackPhase: null,
+      isSuperCharged: true,
+      isEndingPreview: true,
+    };
+
+    // Celebratory confetti particles in champion colors
+    const confettiColors = [
+      '#f59e0b', '#ec4899', '#3b82f6', '#10b981', '#8b5cf6', '#fbbf24', '#ffffff', '#e11d48',
+      themeColor, charData.auraColor || themeColor
+    ];
+    this.endingConfetti = Array.from({ length: 42 }, () => ({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * canvas.height * 1.2,
+      w: 4 + Math.random() * 5,
+      h: 6 + Math.random() * 8,
+      vx: (Math.random() - 0.5) * 1.6,
+      vy: 1.4 + Math.random() * 2.2,
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 0.12,
+      color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+    }));
+
+    const loop = () => {
+      if (this.state !== 'VICTORY_ENDING') {
+        this.stopEndingAnimation();
+        return;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Advance timers
+      this.endingFighter.animTimer++;
+      this.endingFighter.stateTimer++;
+
+      // Seamless celebration cycle (plays full entrance sequence, loops smoothly)
+      if (this.endingFighter.stateTimer > 320) {
+        this.endingFighter.stateTimer = 0;
+      }
+
+      // Soft magical ambient aura behind champion
+      const auraGrad = ctx.createRadialGradient(140, 195, 20, 140, 195, 135);
+      auraGrad.addColorStop(0, `${themeColor}44`);
+      auraGrad.addColorStop(0.7, `${themeColor}12`);
+      auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = auraGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Pedestal top rim oval highlight on the floor
+      ctx.save();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.strokeStyle = `${themeColor}66`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(140, 290, 85, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      // Render animated sprite
+      window.drawFighterCanvas(ctx, this.endingFighter);
+
+      // Render and drift celebratory confetti over the scene
+      ctx.save();
+      for (const p of this.endingConfetti) {
+        p.x += p.vx + Math.sin(this.endingFighter.animTimer * 0.05 + p.y * 0.04) * 0.6;
+        p.y += p.vy;
+        p.rot += p.vrot;
+        if (p.y > canvas.height + 15) {
+          p.y = -15;
+          p.x = Math.random() * canvas.width;
+        }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+      ctx.restore();
+
+      this.endingAnimFrame = requestAnimationFrame(loop);
+    };
+
+    this.endingAnimFrame = requestAnimationFrame(loop);
+  }
+
 
   openContinueScreen() {
     this.state = 'CONTINUE';
@@ -1769,6 +1926,7 @@ class GameEngine {
   }
 
   hideAllScreens() {
+    this.stopEndingAnimation();
     const screens = [
       'screen-title', 'screen-select', 'screen-prologue', 'screen-ladder',
       'screen-stage-clear', 'screen-ending', 'screen-continue', 'screen-gameover',
@@ -1789,6 +1947,7 @@ class GameEngine {
   }
 
   returnToTitle() {
+    this.stopEndingAnimation();
     this.resetKeys();
     if (this.continueInterval) clearInterval(this.continueInterval);
     this.state = 'TITLE';

@@ -496,7 +496,7 @@ const CHARACTERS = {
   }
 };
 
-const SPRITE_POSES = ['idle', 'idle2', 'punch', 'punch1', 'punch2', 'punch3', 'punch4', 'kick', 'kick1', 'kick2', 'kick3', 'kick4', 'crouch_kick', 'crouch_kick1', 'crouch_kick2', 'block', 'special', 'special1', 'special2', 'super', 'crouch', 'jump', 'fall', 'fly', 'fly2', 'walk1', 'walk2', 'back1', 'back2', 'knockdown', 'victory', 'victory1', 'victory2', 'victory3', 'victory4', 'victory5', 'victory6', 'fly_punch', 'fly_punch1', 'fly_punch2', 'fly_kick', 'fly_kick1', 'fly_kick2'];
+const SPRITE_POSES = ['idle', 'idle2', 'punch', 'punch1', 'punch2', 'punch3', 'punch4', 'kick', 'kick1', 'kick2', 'kick3', 'kick4', 'crouch_kick', 'crouch_kick1', 'crouch_kick2', 'crouch_punch', 'block', 'special', 'special1', 'special2', 'super', 'crouch', 'jump', 'fall', 'fly', 'fly2', 'walk1', 'walk2', 'back1', 'back2', 'knockdown', 'victory', 'victory1', 'victory2', 'victory3', 'victory4', 'victory5', 'victory6', 'fly_punch', 'fly_punch1', 'fly_punch2', 'fly_kick', 'fly_kick1', 'fly_kick2', 'air_punch'];
 const fighterSprites = {};
 Object.keys(CHARACTERS).forEach(id => {
   if (!window.SPRITE_META || !window.SPRITE_META[id]) return;
@@ -608,6 +608,12 @@ function pickSpritePose(f) {
       if (vt < 126) return 'victory5';
       return 'victory6';
     }
+    if (f.charId === 'owl') {
+      const vt = f.stateTimer || 0;
+      if (vt < 28) return 'idle';
+      if (vt < 65) return 'fly';
+      return 'super';
+    }
   }
   if (s === 'KNOCKDOWN' || s === 'DEFEAT') {
     if (f.charId === 'alligator' || f.charId === 'bear' || f.charId === 'capybara' || f.charId === 'cat' || f.charId === 'gorilla' || f.charId === 'owl' || f.charId === 'tiger' || f.charId === 'wolf') {
@@ -654,7 +660,7 @@ function pickSpritePose(f) {
   }
   if (s === 'CROUCH') return 'crouch';
   if (s === 'BLOCK') {
-    if (f.charId === 'emerson') return 'block';
+    if (f.charId === 'emerson' || f.charId === 'andrey') return 'block';
     return 'idle';
   }
   if (s === 'JUMP') {
@@ -694,6 +700,9 @@ function pickSpritePose(f) {
       if (f.charId === 'emerson') {
         return (f.attackPhase === 'startup') ? 'crouch_kick1' : 'crouch_kick2';
       }
+      if (f.charId === 'andrey') {
+        return 'crouch_kick';
+      }
       return 'crouch';
     }
     if (f.charId === 'emerson') {
@@ -710,7 +719,10 @@ function pickSpritePose(f) {
     if (f.charId === 'dragon' && (f.isFlying || !f.isGrounded)) {
       return (f.attackPhase === 'startup') ? 'fly_punch1' : 'fly_punch2';
     }
-    if (f.isCrouchAttacking) return 'crouch';
+    if (f.isCrouchAttacking) {
+      if (f.charId === 'andrey') return 'crouch_punch';
+      return 'crouch';
+    }
     if (f.charId === 'emerson') {
       const t = f.stateTimer || 0;
       if (t < 4) return 'punch1';
@@ -718,7 +730,10 @@ function pickSpritePose(f) {
       if (t < 12) return 'punch3';
       return 'punch4';
     }
-    if (f.isAirAttacking || !f.isGrounded) return 'jump';
+    if (f.isAirAttacking || !f.isGrounded) {
+      if (f.charId === 'andrey') return 'air_punch';
+      return 'jump';
+    }
     return (f.attackPhase === 'startup' && f.stateTimer < 3) ? 'idle' : 'punch';
   }
   if (!f.isGrounded) {
@@ -798,7 +813,7 @@ function drawFighterSprite(ctx, fighter) {
 
   // Ground level (for the shadow while jumping)
   let groundY = fighter.y;
-  if (window.stageManager && window.stageManager.getCurrentStage) {
+  if (!fighter.isEndingPreview && window.stageManager && window.stageManager.getCurrentStage) {
     const st = window.stageManager.getCurrentStage();
     if (st) groundY = st.groundY;
   }
@@ -828,11 +843,13 @@ function drawFighterSprite(ctx, fighter) {
     rot = Math.sin(t * 0.08) * 0.03 + Math.max(-0.25, Math.min(0.25, fighter.vx * 0.04));
     sy = 1 + Math.sin(t * 0.22) * 0.025;
   } else if (state === 'IDLE' || state === 'VICTORY') {
-    if (state === 'VICTORY' && (fighter.charId === 'emerson' || fighter.charId === 'andrey' || fighter.charId === 'alligator' || fighter.charId === 'bear' || fighter.charId === 'capybara' || fighter.charId === 'nata' || fighter.charId === 'cat' || fighter.charId === 'dog' || fighter.charId === 'gorilla' || fighter.charId === 'tiger' || fighter.charId === 'wolf' || fighter.charId === 'dragon')) {
+    if (state === 'VICTORY' && (fighter.charId === 'emerson' || fighter.charId === 'andrey' || fighter.charId === 'alligator' || fighter.charId === 'bear' || fighter.charId === 'capybara' || fighter.charId === 'nata' || fighter.charId === 'cat' || fighter.charId === 'dog' || fighter.charId === 'gorilla' || fighter.charId === 'tiger' || fighter.charId === 'wolf' || fighter.charId === 'dragon' || fighter.charId === 'owl')) {
       offY = 0;
       sy = 1;
       sx = 1;
-      if (pose === 'victory6' && fighter.charId === 'dragon') {
+      if (fighter.charId === 'owl') {
+        offY = -12 + Math.sin(t * 0.12) * 6; // majestic hovering wings
+      } else if (pose === 'victory6' && fighter.charId === 'dragon') {
         offX = (Math.random() - 0.5) * 2; // primordial dragon roar vibration
       } else if (pose === 'victory4' && fighter.charId === 'emerson') {
         offX = (Math.random() - 0.5) * 2; // subtle electric aura vibration
@@ -888,7 +905,7 @@ function drawFighterSprite(ctx, fighter) {
   } else if (pose === 'walk1' || pose === 'walk2' || pose === 'back1' || pose === 'back2') {
     offY = (pose === 'walk1' || pose === 'back1') ? -2 : 0;
   } else if (state === 'BLOCK') {
-    if (fighter.charId === 'emerson') {
+    if (fighter.charId === 'emerson' || fighter.charId === 'andrey') {
       offX = 0;
       rot = 0;
     } else {
@@ -921,12 +938,12 @@ function drawFighterSprite(ctx, fighter) {
     }
   } else if (isAttack) {
     if (fighter.isCrouchAttacking) {
-      offX = fighter.charId === 'emerson' ? 0 : (fighter.attackPhase === 'active' ? 16 : 6);
-      rot = fighter.charId === 'emerson' ? 0 : 0.06;
+      offX = (fighter.charId === 'emerson' || fighter.charId === 'andrey') ? 0 : (fighter.attackPhase === 'active' ? 16 : 6);
+      rot = (fighter.charId === 'emerson' || fighter.charId === 'andrey') ? 0 : 0.06;
     } else if (fighter.isAirAttacking || !fighter.isGrounded || fighter.isFlying) {
-      if (fighter.charId === 'dragon') {
-        rot = 0.04;
-        offX = fighter.attackPhase === 'active' ? 10 : 2;
+      if (fighter.charId === 'dragon' || (fighter.charId === 'andrey' && (pose === 'air_punch' || pose === 'fly_punch'))) {
+        rot = 0.02;
+        offX = fighter.attackPhase === 'active' ? 6 : 0;
       } else {
         rot = fighter.attackPhase === 'active' ? 0.38 : 0.15; // diving strike
         offX = fighter.attackPhase === 'active' ? 10 : 0;
@@ -1009,12 +1026,13 @@ function drawFighterSprite(ctx, fighter) {
 
   // --- Blocking shield ---
   if (state === 'BLOCK') {
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
-    ctx.shadowColor = '#38bdf8';
-    ctx.shadowBlur = 14;
+    const isAndrey = fighter.charId === 'andrey';
+    ctx.strokeStyle = isAndrey ? 'rgba(16, 185, 129, 0.9)' : 'rgba(56, 189, 248, 0.85)';
+    ctx.shadowColor = isAndrey ? '#10b981' : '#38bdf8';
+    ctx.shadowBlur = isAndrey ? 18 : 14;
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.arc(fw * 0.25, -fh * 0.55, fh * 0.42, -Math.PI / 2.6, Math.PI / 2.6);
+    ctx.arc(fw * 0.22, -fh * 0.52, fh * 0.42, -Math.PI / 2.6, Math.PI / 2.6);
     ctx.stroke();
   }
 

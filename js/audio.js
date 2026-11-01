@@ -494,6 +494,22 @@ class SoundEngine {
     }
   }
 
+  // Grand Ending Epilogue Fanfare for defeating the entire game!
+  playGrandEndingFanfare(charId) {
+    if (!this.sfxEnabled) return;
+    this.init();
+    if (charId === 'nata') {
+      this.playNataGuitarVictory('solo');
+    } else {
+      this.playUnicaoCongratulations('fanfare');
+      if (charId === 'dragon') {
+        setTimeout(() => { if (this.playDragonFire) this.playDragonFire(); }, 600);
+      } else if (charId === 'emerson') {
+        setTimeout(() => { if (this.playSuperActivate) this.playSuperActivate(); }, 400);
+      }
+    }
+  }
+
 
   // Round start bell
   playRoundStart() {

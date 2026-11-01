@@ -134,19 +134,35 @@ class Fighter {
     let box = null;
 
     if (this.isCrouchAttacking) {
-      // Low sweep attack near ground
-      const w = this.charId === 'emerson' ? 115 : 85;
-      const h = 40;
-      box = {
-        x: dir === 1 ? this.x + 10 : this.x - (w + 10),
-        y: this.y - this.height * 0.35,
-        width: w,
-        height: h,
-        damage: (this.charId === 'emerson' ? 75 : 65) * this.power,
-        isHeavy: true,
-        knockback: (this.charId === 'emerson' ? 9 : 7) * dir,
-        hitStun: 22
-      };
+      if (this.state === 'ATTACK_LIGHT') {
+        // Low ducking punch / jab
+        const w = (this.charId === 'emerson' || this.charId === 'andrey') ? 95 : 75;
+        const h = 42;
+        box = {
+          x: dir === 1 ? this.x + 10 : this.x - (w + 10),
+          y: this.y - this.height * 0.45,
+          width: w,
+          height: h,
+          damage: 50 * this.power,
+          isHeavy: false,
+          knockback: 4 * dir,
+          hitStun: 16
+        };
+      } else {
+        // Low sweep / crouch kick
+        const w = (this.charId === 'emerson' || this.charId === 'andrey') ? 115 : 85;
+        const h = 40;
+        box = {
+          x: dir === 1 ? this.x + 10 : this.x - (w + 10),
+          y: this.y - this.height * 0.35,
+          width: w,
+          height: h,
+          damage: (this.charId === 'emerson' ? 75 : 68) * this.power,
+          isHeavy: true,
+          knockback: (this.charId === 'emerson' ? 9 : 8) * dir,
+          hitStun: 22
+        };
+      }
     } else if (isDragon) {
       // --- BOSS VULCANUS ATTACK HITBOXES (GROUND & FLIGHT) ---
       // Whether flying or grounded, the dragon's punches/claws strike downwards and forwards
@@ -212,15 +228,16 @@ class Fighter {
     } else if (this.isAirAttacking) {
       // --- PLAYER AERIAL ATTACKS (JUMP + PUNCH & JUMP + KICK) ---
       if (this.state === 'ATTACK_LIGHT') {
-        // Aerial Anti-Air Punch: angled upwards and forwards to reach flying dragons!
-        const w = 95;
-        const h = 85;
+        // Aerial Anti-Air / Diving Strike
+        const isAndrey = this.charId === 'andrey';
+        const w = isAndrey ? 110 : 95;
+        const h = isAndrey ? 95 : 85;
         box = {
           x: dir === 1 ? this.x + 5 : this.x - (w + 5),
-          y: this.y - this.height * 0.95,
+          y: isAndrey ? (this.y - this.height * 0.75) : (this.y - this.height * 0.95),
           width: w,
           height: h,
-          damage: 55 * this.power,
+          damage: (isAndrey ? 62 : 55) * this.power,
           isHeavy: false,
           knockback: 5 * dir,
           hitStun: 18

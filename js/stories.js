@@ -147,81 +147,120 @@ window.GAME_STORIES = {
   // --- 5. FINAIS CINEMATOGRÁFICOS COMPLETOS (Vitória sobre o último Boss) ---
   championEndings: {
     dog: {
-      title: 'UNICÃO - O SUPER CÃO CÓSMICO E GUARDIÃO ETERNO',
-      text: `Com um salto acrobático e o impacto estelar do lendário Super Cão Cósmico, Unicão desferiu o golpe de misericórdia sobre Vulcanus, dissipando as chamas infernais do dragão em uma chuva de auroras boreais coloridas.<br><br>
-      As ruas e florestas de todas as regiões comemoraram: o cão que começou com determinação pura agora é reverenciado como o Super Cão protetor supremo do planeta. Unicão recebeu a lendária Coleira de Ouro Cósmica e jurou continuar protegendo a todos, garantindo que a paz reine absoluta nas arenas!`
+      title: 'UNICÃO - O SUPER CÃO CÓSMICO',
+      epithet: 'LEALDADE INABALÁVEL, CORAÇÃO DE OURO E O PROTETOR DOS AMIGOS',
+      text: `Com um salto acrobático e a explosão de ki estelar do lendário Super Cão, <strong>Unicão</strong> desferiu o golpe de misericórdia sobre Vulcanus, dissipando as labaredas infernais do dragão em uma gloriosa chuva de auroras boreais coloridas!<br><br>
+      As ruas, praças e florestas de todas as regiões comemoraram em uníssono: o cãozinho leal que começou sua jornada para defender sua matilha agora é reverenciado como o <strong>Super Cão Protetor Supremo do Universo</strong>.<br><br>
+      Na grande cerimônia das estrelas, Unicão vestiu sua toga de formatura de herói cósmico, segurou seu canudo de ouro e ergueu o punho em triunfo: seu juramento de proteger a todos com coragem e amor foi gravado para sempre no firmamento das galáxias!`,
+      quote: 'Latir pelo bem, lutar pelos amigos e jamais recuar! Enquanto houver esperança no coração, o Super Cão sempre vencerá!'
     },
 
     emerson: {
       title: 'EMERSON - O ARQUITETO DO UNIVERSO 100% UPTIME',
-      text: `Executando com calma hercúlea o comando supremo <strong>sudo systemctl kill vulcanus-daemon -s SIGKILL</strong>, Emerson canalizou gigawatts de potência quântica através de suas luvas térmicas. As lavas do dragão foram condensadas em silício puro e reconfiguradas em servidores de ultra-alta performance!<br><br>
-      Todo o ecossistema agora opera com 100% de disponibilidade, zero latência e arquitetura redundante perfeita. Emerson ergueu sua caneca de café sagrada no cume do vulcão: o mundo agora tem o Arquiteto Lendário no controle do Terminal!`
+      epithet: 'SENHOR DOS SERVIDORES, REDUNDÂNCIA TOTAL E COMANDANTE DO TERMINAL',
+      text: `No topo do vulcão em erupção, enquanto Vulcanus rugia rios de magma, <strong>Emerson</strong> permaneceu calmo com a serenidade de quem já enfrentou queda de cluster em plena Black Friday. Desferindo sua sequência devastadora de chutes elétricos de alta voltagem e socos carregados com terawatts de energia pura, Emerson encurralou o monstro ancestral!<br><br>
+      Abrindo seu terminal quântico portátil, Emerson executou o comando definitivo: <strong>sudo systemctl kill vulcanus-daemon -s SIGKILL && sudo purge --force magma-core</strong>. As lavas do dragão foram condensadas em silício puro e reconfiguradas em uma infraestrutura universal de servidores redundantes de latência zero!<br><br>
+      Todo o ecossistema agora opera com <strong>100% de Uptime</strong>, zero pacotes perdidos e failover instantâneo. Emerson serviu-se de uma caneca fumegante de café forte no cume do Data Center Central: o mundo agora tem o Arquiteto Lendário no controle do Terminal!`,
+      quote: 'Uptime restaurado em 100%. Latência zero. Podem dar deploy na sexta-feira com tranquilidade, porque aqui o servidor nunca cai!'
     },
 
     nata: {
       title: 'NATÃ - O COMPILADOR SUPREMO DA REALIDADE DIGITAL',
-      text: `Concentrando toda a energia de suas tags semânticas e folhas de estilo universais, Natã disparou o colossal <strong>HADOUKEN DE HTML & CSS / DISPLAY: FLEX!</strong>. A onda massiva de tags coloridas, classes semânticas e seletores universais envolveu Vulcanus, re-renderizando a estrutura do dragão em código limpo, estável e livre de bugs!<br><br>
-      O ecossistema digital foi salvo: as interfaces ficaram 100% responsivas em todos os dispositivos, o Uptime atingiu a perfeição e o mundo celebrou a aliança perfeita entre o Frontend de Natã e os Servidores de Emerson. Natã ergueu seu troféu de código dourado e publicou o commit final: <em>git commit -m "Vulcanus defeated: world deployed to production successfully!"</em>.`
+      epithet: 'ARQUITETO DE INTERFACES, ROCKSTAR DO CSS E MESTRE DO DISPLAY: FLEX',
+      text: `Diante da fornalha incandescente do dragão, <strong>Natã</strong> concentrou toda a força de suas tags semânticas e folhas de estilo universais. Desviando das bolas de fogo com movimentos semânticos perfeitos, ele disparou o colossal <strong>HADOUKEN DE HTML & CSS (DISPLAY: FLEX / ALIGN-ITEMS: CENTER / JUSTIFY-CONTENT: SPACE-BETWEEN)</strong>!<br><br>
+      A onda massiva de tags coloridas, seletores universais e transições suaves envolveu Vulcanus, re-renderizando a estrutura caótica do monstro em código limpo, modular e livre de qualquer bug! O vulcão foi transformado em um majestoso palco de festival de rock iluminado por luzes neon e som surround 8K.<br><br>
+      Natã plugou sua guitarra elétrica nos amplificadores cósmicos de Emerson e tocou o mais eletrizante solo da história do Super Fighters Combat, enquanto registrava seu commit final para a eternidade: <em>git commit -m "Vulcanus refatorado com sucesso. Mundo 100% responsivo!"</em>.`,
+      quote: 'Zero erros, zero warnings no console e layout 100% responsivo. A vitória não é apenas vencer... é vencer com estilo semântico!'
     },
 
     andrey: {
-      title: 'ANDREY - A ERA DA INTELIGÊNCIA ARTIFICIAL E DA SINGULARIDADE',
-      text: `Combinando cálculos matemáticos quânticos de altíssima ordem com o comando supremo do seu enxame de robôs de IA autônomos, Andrey desferiu o golpe de misericórdia sobre Vulcanus: um turbilhão de tensores e raios esmeralda que reconfiguraram a rede neural do dragão para o modo pacífico!<br><br>
-      O Laboratório Quântico de Andrey tornou-se o epicentro de uma nova era de harmonia cibernética. Junto a Emerson nos servidores e Natã no desenvolvimento de sistemas, Andrey implementou a Singularidade Tecnológica Perfeita: cidades futuristas alimentadas por inteligência limpa, robôs protetores e algoritmos que garantem a paz universal em todas as arenas!`
+      title: 'ANDREY - O ARQUITETO DA SINGULARIDADE QUÂNTICA',
+      epithet: 'DOUTOR DAS REDES PROFUNDAS, COMANDANTE DOS DRONES DE PLASMA E GÊNIO DO DUCKS',
+      text: `Vestindo com orgulho seu lendário manto do Ducks de Anaheim e seus óculos de precisão quântica, <strong>Andrey</strong> calibrou seus modelos de redes neurais profundas. Enquanto Vulcanus mergulhava dos céus em um turbilhão de fogo, a IA de Andrey já havia simulado 47 bilhões de possibilidades antes do golpe aterrissar!<br><br>
+      Com um gesto preciso, Andrey ativou seu enxame de robôs de combate autônomos. Orbitando em sincronia quântica perfeita, os drones dispararam um vórtice de plasma esmeralda que neutralizou a energia caótica do dragão em nível subatômico, encerrando a batalha com elegância matemática impecável.<br><br>
+      O Laboratório Quântico de Andrey tornou-se o epicentro de uma nova era de harmonia: cidades inteligentes alimentadas por energia limpa, robôs protetores e algoritmos que garantem a paz universal em todas as arenas!`,
+      quote: 'A matemática do universo é absoluta. Cada variável foi calculada, e a convergência da paz foi matematicamente demonstrada!'
     },
 
     alligator: {
       title: 'BRUTUS - O IMPERADOR DO PANTANAL PROFUNDO',
-      text: `Com um rugido ensurdecedor que abalou a crosta terrestre, Brutus agarrou a cauda do dragão e aplicou o mítico *Giro da Morte Cataclísmico*, arremessando Vulcanus contra as paredes de magma e apagando a fornalha ancestral.<br><br>
-      As águas puras voltaram a inundar os leitos sagrados. Brutus retornou aos seus domínios ovacionado por milhares de jacarés e répteis, consagrando o Pantanal como o império mais poderoso e temido da terra.`
+      epithet: 'MANDÍBULAS DE TITÂNIO, SENHOR DOS RIOS E TERROR DAS CORRENTES',
+      text: `Com um rugido ensurdecedor que abalou a crosta terrestre, <strong>Brutus</strong> nadou contra a torrente de lava incandescente com sua couraça escamosa impenetrável. Travando suas mandíbulas de aço na cauda de Vulcanus, aplicou o lendário <strong>Giro da Morte Cataclísmico de 360 Graus</strong>!<br><br>
+      O impacto arremessou o dragão contra o leito vulcânico, partindo as rochas e fazendo brotar torrentes de água fresca e pura do aquífero ancestral. As labaredas foram extintas e a vida voltou a florescer nas margens sagradas.<br><br>
+      Brutus retornou aos seus domínios ovacionado por milhares de jacarés, ariranhas e aves pantaneiras, consagrando o Pantanal como o império mais poderoso e temido da terra!`,
+      quote: 'Nas minhas águas manda quem tem dente! O fogo do dragão virou vapor e o Pantanal continua sendo a terra do rei Brutus!'
     },
 
     capybara: {
       title: 'MESTRE ZEN - A HARMONIA SUPREMA DA PAZ UNIVERSAL',
-      text: `Sem desferir uma única gota de ódio, Mestre Zen utilizou a energia suave do Chi da Natureza para redirecionar o calor de Vulcanus, acalmando o coração raivoso do dragão até transformá-lo em uma nobre fonte termal de meditação.<br><br>
-      O antigo vulcão da destruição tornou-se o maior templo de retiro espiritual do reino animal. Mestres e guerreiros de todas as terras viajam para aprender com a capivara que derrotou a fúria com a serenidade.`
+      epithet: 'PACIÊNCIA MILENAR, MESTRE DO CHI SUAVE E O CORAÇÃO IMUTÁVEL',
+      text: `Enquanto todos os guerreiros lutavam com fúria e sangue nos olhos, <strong>Mestre Zen</strong> subiu a grande torre com passos suaves e uma tigela de chá verde nas patas. Quando Vulcanus disparou sua onda máxima de destruição, a nobre capivara apenas fechou os olhos, respirou fundo e flutuou suavemente em posição de lótus.<br><br>
+      Utilizando o princípio do Chi Suave da Natureza, Mestre Zen acolheu o fogo do dragão, transformando a ira cósmica em anéis de névoa perfumada de flor de lótus. Desarmado em espírito e corpo, o outrora tirano pousou humildemente ao lado da capivara e pediu para aprender a meditar.<br><br>
+      O antigo covil da destruição tornou-se as famosas Termas Zen do Cume, onde lutadores de todas as galáxias descansam suas armas e aprendem que a maior vitória é dominar a própria mente!`,
+      quote: 'A rocha mais dura é polida pela água suave. Não há fogueira que resista à serenidade de uma mente em paz.'
     },
 
     owl: {
-      title: 'ATHENA - A GUARDIÃ DA GRANDE BIBLIOTECA CELESTIAL',
-      text: `Abrindo suas asas cor de ametista, Athena conjurou os símbolos arcanos dos Pergaminhos Noturnos, selando os poderes de Vulcanus sob uma constelação mágica que jamais se apagará no firmamento.<br><br>
-      Com a vitória, Athena reuniu o conhecimento de todos os campeões e fundou a Grande Academia dos Céus, onde a sabedoria ancestral é protegida para que a luz da razão nunca mais seja ofuscada pelo fogo da ignorância.`
+      title: 'ATHENA - A SÁBIA DOS CÉUS E DA ETERNIDADE',
+      epithet: 'ARQUIVISTA DAS CONSTELAÇÕES, VOO DA MEIA-NOITE E MENTE SUPREMA',
+      text: `Abrindo suas asas cor de ametista sob o céu estrelado, <strong>Athena</strong> já havia previsto cada movimento da batalha nos pergaminhos da astronomia sagrada. Conjurando tornados de penas místicas que desviaram cada labareda do dragão, ela desferiu o golpe de asas da iluminação bem no ponto focal da fera.<br><br>
+      Ativando os Nove Pergaminhos Celestiais, Athena selou a fúria de Vulcanus sob uma constelação mágica que jamais se apagará no firmamento, convertendo a energia do vulcão em uma estrela guia para os navegantes do mundo inteiro.<br><br>
+      Athena fundou a Grande Academia Noturna das Alturas, onde a sabedoria ancestral, a filosofia e as artes marciais são preservadas para que a luz da razão nunca mais seja ofuscada pelas sombras!`,
+      quote: 'A força bruta pode quebrar montanhas, mas apenas a inteligência e o saber são capazes de reescrever o destino.'
     },
 
     tiger: {
       title: 'TORAMARU - O SOBERANO DO ESTILO DAS MIL GARRAS',
-      text: `Com um corte fulminante mais veloz que o raio, Toramaru rasgou o ar com suas garras flamejantes e superou o sopro de Vulcanus no ápice do duelo. O dragão caiu de joelhos diante da perfeição da técnica marcial do tigre.<br><br>
-      Toramaru atingiu o topo absoluto das artes marciais mundiais. Ele agora viaja pelos quatro cantos do mundo como uma lenda viva, treinando a próxima geração de guerreiros com coragem, disciplina e honra inquebrantável.`
+      epithet: 'RELÂMPAGO DA SELVA, PUNHOS DE AÇO E CORAGEM DE TIGRE',
+      text: `Para <strong>Toramaru</strong>, o combate é a mais pura forma de arte e superação interior. No clímax da batalha nas alturas, seus reflexos superaram o próprio raio: ativando o lendário <strong>Estilo das Mil Garras Flamejantes</strong>, seus punhos rasgaram o ar gerando chamas azuis mais quentes que a própria lava!<br><br>
+      Cortando a tempestade de fogo em duas metades com um corte fulminante em X de precisão cirúrgica, Toramaru fez o soberano dos ares cair de joelhos, consagrando-se como o Maior Artista Marcial da História.<br><br>
+      Recusando tronos e glórias vazias, Toramaru amarrou suas faixas de combate e partiu em uma nova peregrinação pelos picos do mundo, sempre em busca de elevar seu espírito marcial a novos horizontes!`,
+      quote: 'O verdadeiro guerreiro não busca troféus... busca a perfeição de cada movimento. Minha garra é a lâmina da minha alma!'
     },
 
     bear: {
       title: 'URSUS - O BALUARTE INQUEBRÁVEL DA TAIGA',
-      text: `Com um golpe sísmico de seus punhos congelados, Ursus quebrou a crosta vulcânica e extinguiu os rios de magma, soterrando a fúria de Vulcanus sob pilares de rocha e gelo eterno.<br><br>
-      O inverno do norte preservou seus domínios. Ursus retornou à floresta boreal onde foi recebido com festas ancestrais, agora imortalizado como o guardião que defendeu a terra com a força dos gigantes da floresta.`
+      epithet: 'COLOSSO DO GELO, FORÇA TITÂNICA E GUARDIÃO DAS NEVES',
+      text: `Marchando contra o calor sufocante do vulcão sem recuar um único passo, <strong>Ursus</strong> sustentou o peso das garras de Vulcanus em seu peito de ferro. Com músculos forjados nas nevascas do norte e patas envoltas em faixas de linho e gelo perpétuo, o urso rugiu como uma avalanche!<br><br>
+      Desferindo o <strong>Impacto Sísmico da Geleira Primordial</strong>, Ursus quebrou a crosta vulcânica e extinguiu os rios de magma, soterrando a fúria da fornalha ancestral sob pilares gigantescos de quartzo e gelo indestrutível!<br><br>
+      O inverno do norte preservou seus domínios sagrados. Ursus retornou à floresta boreal onde foi recebido com festas e danças tribais, coroado para sempre como o Baluarte Protetor de todas as criaturas das terras selvagens.`,
+      quote: 'O fogo consome tudo por um instante, mas o gelo e a rocha permanecem para sempre. O norte nunca cairá!'
     },
 
     gorilla: {
       title: 'KONGO - O REI ABSOLUTO DO IMPÉRIO PRIMATA',
-      text: `Batendo no peito de ébano como tambores de guerra, Kongo suportou o impacto das chamas e ergueu o dragão pelos chifres, demonstrando a força bruta inigualável do clã dos primatas.<br><br>
-      Kongo unificou todas as tribos da grande selva sob um código de justiça, lealdade e bravura. A coroa de ouro brilha sobre sua cabeça enquanto sua guarda de gorilas garante que a paz reine por muitas gerações.`
+      epithet: 'FORÇA TITÂNICA, COROA DOURADA E O MAJESTOSO SENHOR DA SELVA',
+      text: `Batendo no peito de ébano como tambores de guerra ancestrais, <strong>Kongo</strong> suportou o sopro das chamas com coragem indomável. Avançando com passos de montanha, o grande gorila agarrou os dois chifres maciços de Vulcanus no ar e desferiu um arremesso telúrico que estremeceu todo o continente!<br><br>
+      Provando que a coragem de quem luta para proteger sua família supera qualquer labareda mágica, Kongo colocou a lendária Coroa de Ouro sobre a cabeça e soltou o rugido do verdadeiro Rei da Terra.<br><br>
+      Todas as tribos da grande selva foram unificadas sob um código de lealdade, bravura e justiça. A guarda de gorilas de Kongo agora garante que a paz reine soberana por incontáveis gerações!`,
+      quote: 'Músculo de verdade serve para proteger quem não pode lutar. A selva tem um rei, e sua honra é inabalável!'
     },
 
     wolf: {
       title: 'LOBO GUARÁ - O MITO INVENCÍVEL DO CERRADO BRASILEIRO',
-      text: `Envolto em uma aura de fogo solar resplandecente, o Lobo Guará correu em círculos tão velozes que gerou um redemoinho de fogo dourado, superando Vulcanus no seu próprio elemento.<br><br>
-      Com a faixa verde e amarela erguida no cume da montanha, Guará tornou-se o herói mítico celebrado por todo o país. Sua lenda corre pelas noites enluaradas do Cerrado: onde houver perigo, o lobo flamejante surgirá para defender seu povo!`
+      epithet: 'CHAMA DOURADA, VELOCIDADE DA LUZ E O ESPÍRITO DAS SAVANAS',
+      text: `Carregando o fogo solar do Cerrado brasileiro em suas veias, o <strong>Lobo Guará</strong> correu em círculos tão velozes que gerou um ciclone de brasas douradas ao redor da cratera vulcânica. Com a faixa verde e amarela reluzindo na testa, superou Vulcanus na sua própria velocidade!<br><br>
+      Ao desferir a mordida solar definitiva, Guará dispersou as cinzas do tirano e devolveu o brilho do sol ao horizonte. Ele subiu ao cume mais alto da cordilheira e soltou um uivo cristalino que ecoou pelas noites enluaradas de todo o país.<br><br>
+      Guará tornou-se o herói mítico celebrado por todo o povo: o guardião invencível das savanas, rápido como o vento, feroz como a tempestade e eterno em sua bravura!`,
+      quote: 'No rastro do Lobo Guará só fica poeira e vitória! O cerrado tem coração valente e alma que nunca se apaga!'
     },
 
     cat: {
       title: 'KAGE - A ORDEM OCULTA DAS GARRAS DE JADE',
-      text: `Com uma velocidade que desafiou as leis da física, Kage deslizou pelas sombras das labaredas e cravou seus golpes vitais nos pontos de chakra de Vulcanus, desarmando o dragão sem emitir um único som.<br><br>
-      Ao amanhecer, o dragão jazia derrotado e o ninja felino havia desaparecido no nevoeiro matinal. Kage fundou a Ordem Oculta de Vigilantes das Sombras, protegendo o mundo em segredo dos perigos que caminham na escuridão.`
+      epithet: 'PASSO INVISÍVEL, CORTE SILENCIOSO E O FANTASMA DA MEIA-NOITE',
+      text: `Nem mesmo as labaredas de um dragão ancestral conseguem queimar aquilo que não pode ser visto nem ouvido. Deslizando pelas sombras do vulcão como uma brisa silenciosa, <strong>Kage</strong> desferiu cortes de jade imperceptíveis nos pontos vitais de chakra de Vulcanus.<br><br>
+      Antes que a primeira labareda tocasse o chão, o titã alado desmoronou sem sequer compreender de onde vieram os golpes. Kage limpou suas lâminas com elegância, lambeu sua pata com serenidade felina e desapareceu no nevoeiro matinal sem deixar um único rastro.<br><br>
+      Ele agora lidera a Ordem Oculta de Vigilantes das Sombras, garantindo do silêncio da noite que nenhum tirano volte a ameaçar a harmonia do mundo!`,
+      quote: 'A verdadeira força não precisa fazer barulho. Um sussurro na escuridão basta para mudar o destino do mundo.'
     },
 
     dragon: {
-      title: 'VULCANUS - O DEUS SOBERANO DO COSMOS DE MAGMA',
-      text: `Derrotando o formidável Arquiteto Emerson no cume da torre, Vulcanus absorveu os servidores quânticos e fundiu a tecnologia dos terminais com seu fogo primordial ancestral.<br><br>
-      O mundo agora treme perante a Divindade Suprema dos Céus de Lava! Nenhuma criatura ousa desafiar a tempestade de meteoros de Vulcanus, cujo império eterno agora rege terra, céu e dados por toda a eternidade!`
+      title: 'VULCANUS - O IMPERADOR ETERNO DOS CÉUS DE FOGO',
+      epithet: 'FOGO PRIMORDIAL, ASAS DO CATACLISMO E O SENHOR DO MAGMA',
+      text: `Submetendo todos os desafiantes da grande torre ao fogo de suas chamas milenares, <strong>Vulcanus</strong> abriu suas asas colossais de cem metros e cobriu o firmamento com um espetáculo de auroras cósmicas e meteoros incandescentes!<br><br>
+      O dragão primordial não destruiu a terra: ele a refinou no fogo sagrado, eliminando todas as fraquezas e forjando uma era de ouro onde apenas os guerreiros mais bravos e valorosos têm a honra de contemplar o trono de magma.<br><br>
+      Seu império de calor, honra e luz agora brilha por toda a eternidade, unindo céus, montanhas e estrelas sob o voo triunfal do maior titã que as eras já conheceram!`,
+      quote: 'Curvem-se, criaturas mortais! As cinzas do passado deram lugar ao império eterno das chamas imortais!'
     }
   }
 };
