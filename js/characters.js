@@ -496,7 +496,7 @@ const CHARACTERS = {
   }
 };
 
-const SPRITE_POSES = ['idle', 'idle2', 'punch', 'kick', 'special', 'special1', 'special2', 'super', 'crouch', 'jump', 'fall', 'fly', 'fly2', 'walk1', 'walk2', 'back1', 'back2', 'knockdown', 'victory', 'victory1', 'victory2', 'victory3', 'victory4', 'victory5', 'victory6', 'fly_punch', 'fly_punch1', 'fly_punch2', 'fly_kick', 'fly_kick1', 'fly_kick2'];
+const SPRITE_POSES = ['idle', 'idle2', 'punch', 'punch1', 'punch2', 'punch3', 'punch4', 'kick', 'kick1', 'kick2', 'kick3', 'kick4', 'crouch_kick', 'crouch_kick1', 'crouch_kick2', 'block', 'special', 'special1', 'special2', 'super', 'crouch', 'jump', 'fall', 'fly', 'fly2', 'walk1', 'walk2', 'back1', 'back2', 'knockdown', 'victory', 'victory1', 'victory2', 'victory3', 'victory4', 'victory5', 'victory6', 'fly_punch', 'fly_punch1', 'fly_punch2', 'fly_kick', 'fly_kick1', 'fly_kick2'];
 const fighterSprites = {};
 Object.keys(CHARACTERS).forEach(id => {
   if (!window.SPRITE_META || !window.SPRITE_META[id]) return;
@@ -627,14 +627,36 @@ function pickSpritePose(f) {
       if (s === 'SUPER') return 'special'; // Super é o sprite de fogo
       if (s === 'SPECIAL') return 'fly';
     } else {
-      if (s === 'ATTACK_LIGHT') return 'punch';
-      if (s === 'ATTACK_HEAVY') return 'kick';
+      if (s === 'ATTACK_LIGHT') {
+        if (f.charId === 'emerson') {
+          const t = f.stateTimer || 0;
+          if (t < 4) return 'punch1';
+          if (t < 8) return 'punch2';
+          if (t < 12) return 'punch3';
+          return 'punch4';
+        }
+        return 'punch';
+      }
+      if (s === 'ATTACK_HEAVY') {
+        if (f.charId === 'emerson') {
+          const t = f.stateTimer || 0;
+          if (t < 5) return 'kick1';
+          if (t < 9) return 'kick2';
+          if (t < 14) return 'kick3';
+          return 'kick4';
+        }
+        return 'kick';
+      }
       if (s === 'SPECIAL' || s === 'SUPER') return 'special';
     }
     // Bater asas com dois sprites (alternando asas para cima / asas para baixo)
     return (Math.floor(f.animTimer / 8) % 2 === 0) ? 'fly' : 'fly2';
   }
   if (s === 'CROUCH') return 'crouch';
+  if (s === 'BLOCK') {
+    if (f.charId === 'emerson') return 'block';
+    return 'idle';
+  }
   if (s === 'JUMP') {
     if (f.charId === 'dragon') {
       return (Math.floor(f.animTimer / 8) % 2 === 0) ? 'fly' : 'fly2';
@@ -668,7 +690,19 @@ function pickSpritePose(f) {
     if (f.charId === 'dragon' && (f.isFlying || !f.isGrounded)) {
       return (f.attackPhase === 'startup') ? 'fly_kick1' : 'fly_kick2';
     }
-    if (f.isCrouchAttacking) return 'crouch';
+    if (f.isCrouchAttacking) {
+      if (f.charId === 'emerson') {
+        return (f.attackPhase === 'startup') ? 'crouch_kick1' : 'crouch_kick2';
+      }
+      return 'crouch';
+    }
+    if (f.charId === 'emerson') {
+      const t = f.stateTimer || 0;
+      if (t < 5) return 'kick1';
+      if (t < 9) return 'kick2';
+      if (t < 14) return 'kick3';
+      return 'kick4';
+    }
     if (f.isAirAttacking || !f.isGrounded) return 'kick';
     return (f.attackPhase === 'startup' && f.stateTimer < 3) ? 'idle' : 'kick';
   }
@@ -677,6 +711,13 @@ function pickSpritePose(f) {
       return (f.attackPhase === 'startup') ? 'fly_punch1' : 'fly_punch2';
     }
     if (f.isCrouchAttacking) return 'crouch';
+    if (f.charId === 'emerson') {
+      const t = f.stateTimer || 0;
+      if (t < 4) return 'punch1';
+      if (t < 8) return 'punch2';
+      if (t < 12) return 'punch3';
+      return 'punch4';
+    }
     if (f.isAirAttacking || !f.isGrounded) return 'jump';
     return (f.attackPhase === 'startup' && f.stateTimer < 3) ? 'idle' : 'punch';
   }
@@ -847,8 +888,13 @@ function drawFighterSprite(ctx, fighter) {
   } else if (pose === 'walk1' || pose === 'walk2' || pose === 'back1' || pose === 'back2') {
     offY = (pose === 'walk1' || pose === 'back1') ? -2 : 0;
   } else if (state === 'BLOCK') {
-    offX = -6;
-    rot = -0.09;
+    if (fighter.charId === 'emerson') {
+      offX = 0;
+      rot = 0;
+    } else {
+      offX = -6;
+      rot = -0.09;
+    }
   } else if (state === 'HIT') {
     offX = -10;
     rot = -0.2;
@@ -875,8 +921,8 @@ function drawFighterSprite(ctx, fighter) {
     }
   } else if (isAttack) {
     if (fighter.isCrouchAttacking) {
-      offX = fighter.attackPhase === 'active' ? 16 : 6;
-      rot = 0.06;
+      offX = fighter.charId === 'emerson' ? 0 : (fighter.attackPhase === 'active' ? 16 : 6);
+      rot = fighter.charId === 'emerson' ? 0 : 0.06;
     } else if (fighter.isAirAttacking || !fighter.isGrounded || fighter.isFlying) {
       if (fighter.charId === 'dragon') {
         rot = 0.04;
@@ -889,10 +935,10 @@ function drawFighterSprite(ctx, fighter) {
       rot = 0;
       offX = (fighter.charId === 'alligator' || fighter.charId === 'bear' || fighter.charId === 'capybara' || fighter.charId === 'cat') ? 0 : 12;
     } else if (fighter.attackPhase === 'active') {
-      offX = state === 'ATTACK_LIGHT' ? 6 : 14;
-      rot = state === 'ATTACK_LIGHT' ? 0.02 : 0.05;
+      offX = state === 'ATTACK_LIGHT' ? (fighter.charId === 'emerson' ? 0 : 6) : (fighter.charId === 'emerson' ? 0 : 14);
+      rot = state === 'ATTACK_LIGHT' ? (fighter.charId === 'emerson' ? 0 : 0.02) : (fighter.charId === 'emerson' ? 0 : 0.05);
     } else if (fighter.attackPhase === 'recovery') {
-      offX = 4;
+      offX = fighter.charId === 'emerson' ? 0 : 4;
     }
   }
 
@@ -948,7 +994,7 @@ function drawFighterSprite(ctx, fighter) {
     } else if (pose === 'jump') {
       fx = fw - ax;
       fy = -fh * 0.3; // diving knee / kick
-    } else if (pose === 'kick') {
+    } else if (pose === 'kick' || pose.startsWith('kick')) {
       fx = fw - ax + 10;
       fy = -fh * 0.58; // powerful kick impact zone
     } else if (pose === 'special' || pose === 'super') {

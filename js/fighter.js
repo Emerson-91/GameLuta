@@ -135,15 +135,17 @@ class Fighter {
 
     if (this.isCrouchAttacking) {
       // Low sweep attack near ground
+      const w = this.charId === 'emerson' ? 115 : 85;
+      const h = 40;
       box = {
-        x: dir === 1 ? this.x + 10 : this.x - 90,
+        x: dir === 1 ? this.x + 10 : this.x - (w + 10),
         y: this.y - this.height * 0.35,
-        width: 85,
-        height: 40,
-        damage: 65 * this.power,
+        width: w,
+        height: h,
+        damage: (this.charId === 'emerson' ? 75 : 65) * this.power,
         isHeavy: true,
-        knockback: 7 * dir,
-        hitStun: 20
+        knockback: (this.charId === 'emerson' ? 9 : 7) * dir,
+        hitStun: 22
       };
     } else if (isDragon) {
       // --- BOSS VULCANUS ATTACK HITBOXES (GROUND & FLIGHT) ---
@@ -240,30 +242,30 @@ class Fighter {
       }
     } else if (this.state === 'ATTACK_LIGHT') {
       // Ground Light Punch: generous upward reach to clip hovering enemies!
-      const w = 75;
-      const h = 55;
+      const w = this.charId === 'emerson' ? 105 : 75;
+      const h = this.charId === 'emerson' ? 65 : 55;
       box = {
         x: dir === 1 ? this.x + 10 : this.x - (w + 10),
         y: this.y - this.height * 0.85,
         width: w,
         height: h,
-        damage: 45 * this.power,
+        damage: (this.charId === 'emerson' ? 55 : 45) * this.power,
         isHeavy: false,
         knockback: 4 * dir,
         hitStun: 14
       };
     } else if (this.state === 'ATTACK_HEAVY') {
-      const w = this.charId === 'gorilla' ? 120 : (this.charId === 'owl' ? 110 : 90);
-      const h = 65;
+      const w = this.charId === 'gorilla' ? 120 : (this.charId === 'owl' ? 110 : (this.charId === 'emerson' ? 135 : 90));
+      const h = this.charId === 'emerson' ? 75 : 65;
       box = {
         x: dir === 1 ? this.x + 12 : this.x - (w + 12),
         y: this.y - this.height * 0.80,
         width: w,
         height: h,
-        damage: 85 * this.power,
+        damage: (this.charId === 'emerson' ? 95 : 85) * this.power,
         isHeavy: true,
-        knockback: 9 * dir,
-        hitStun: 22
+        knockback: (this.charId === 'emerson' ? 11 : 9) * dir,
+        hitStun: 24
       };
     } else if (this.state === 'SPECIAL') {
       const w = this.charId === 'dog' ? 260 : (this.charId === 'gorilla' ? 210 : (this.charId === 'owl' ? 180 : (this.charId === 'capybara' ? 140 : (this.charId === 'cat' ? 160 : 100))));
@@ -1056,6 +1058,24 @@ class Fighter {
             }
           }
         }
+        if (this.charId === 'emerson' && this.stateTimer === 10) {
+          if (window.particleSystem) {
+            window.particleSystem.shake(2);
+            for (let i = 0; i < 10; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + this.facing * 85,
+                y: this.y - this.height * 0.65,
+                vx: this.facing * (2 + Math.random() * 5),
+                vy: (Math.random() - 0.5) * 5,
+                color: Math.random() > 0.4 ? '#06b6d4' : (Math.random() > 0.5 ? '#38bdf8' : '#ffffff'),
+                life: 14,
+                maxLife: 14,
+                size: 2.5 + Math.random() * 2.5,
+                type: 'spark'
+              });
+            }
+          }
+        }
       } else if (this.stateTimer <= 18) {
         this.attackPhase = 'recovery';
       } else {
@@ -1081,6 +1101,42 @@ class Fighter {
                 life: 16,
                 maxLife: 16,
                 size: 4,
+                type: 'spark'
+              });
+            }
+          }
+        }
+        if (this.charId === 'emerson' && !this.isCrouchAttacking && this.stateTimer === 13) {
+          if (window.particleSystem) {
+            window.particleSystem.shake(4);
+            for (let i = 0; i < 16; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + this.facing * 95,
+                y: this.y - this.height * 0.55,
+                vx: this.facing * (2 + Math.random() * 7),
+                vy: (Math.random() - 0.5) * 6,
+                color: Math.random() > 0.4 ? '#06b6d4' : (Math.random() > 0.5 ? '#38bdf8' : '#ffffff'),
+                life: 18,
+                maxLife: 18,
+                size: 3 + Math.random() * 3,
+                type: 'spark'
+              });
+            }
+          }
+        }
+        if (this.charId === 'emerson' && this.isCrouchAttacking && this.stateTimer === 8) {
+          if (window.particleSystem) {
+            window.particleSystem.shake(2);
+            for (let i = 0; i < 10; i++) {
+              window.particleSystem.particles.push({
+                x: this.x + this.facing * (35 + Math.random() * 60),
+                y: this.y - 8,
+                vx: this.facing * (2 + Math.random() * 4),
+                vy: -Math.random() * 2,
+                color: Math.random() > 0.4 ? '#38bdf8' : '#ffffff',
+                life: 14,
+                maxLife: 14,
+                size: 2.5,
                 type: 'spark'
               });
             }
